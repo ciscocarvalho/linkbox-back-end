@@ -3,7 +3,7 @@ import * as express from "express"
 import { Request, Response } from "express"
 import { myDataSource } from "./index"
 import { ObjectId } from "typeorm"
-import { Link } from "../Model/entity/Link.ts"
+import { Link } from "../Model/Link.ts"
 
 
 export const router = express.Router()

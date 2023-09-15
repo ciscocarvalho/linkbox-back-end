@@ -2,7 +2,7 @@
 import * as express from "express"
 import { Request, Response } from "express"
 import { myDataSource } from "./index"
-import { User } from "../Model/entity/User.ts"
+import { User } from "../Model/User.ts"
 import { ObjectId } from "typeorm"
 
 
