@@ -11,8 +11,8 @@ export const router = express.Router()
 
 
 router.get("/", async function (req: Request, res: Response) {
-    const folder = await myDataSource.getRepository(Dashboard).find()
-    res.json(folder)
+    const dashboard = await myDataSource.getRepository(Dashboard).find()
+    res.json(dashboard)
 }),
 
 
@@ -24,17 +24,17 @@ router.get("/:id", async function (req: Request<{id: ObjectId}>, res: Response) 
 }),
 
 router.post("/", async function (req: Request, res: Response) {
-    const folder = await myDataSource.getRepository(Dashboard).create(req.body)
-    const results = await myDataSource.getRepository(Dashboard).save(folder)
+    const dashboard = await myDataSource.getRepository(Dashboard).create(req.body)
+    const results = await myDataSource.getRepository(Dashboard).save(dashboard)
     return res.send(results)
 }),
 
 router.put("/:id", async function (req: Request<{id: ObjectId}>, res: Response) {
-    const folder = await myDataSource.getRepository(Dashboard).findOneBy({
+    const dashboard = await myDataSource.getRepository(Dashboard).findOneBy({
         dashboard_id: req.params.id,
     })
-    myDataSource.getRepository(Dashboard).merge(folder, req.body)
-    const results = await myDataSource.getRepository(Dashboard).save(folder)
+    myDataSource.getRepository(Dashboard).merge(dashboard, req.body)
+    const results = await myDataSource.getRepository(Dashboard).save(dashboard)
     return res.send(results)
 }),
 
