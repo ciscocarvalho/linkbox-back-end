@@ -1,18 +1,28 @@
-import { Entity, Column, ObjectIdColumn, ObjectId } from "typeorm"
-import { Dashboard } from "./Dashboard"
+// UserModel.ts
+import mongoose, { Schema, Document } from 'mongoose';
+import dashboardSchema, {IDashboard} from './Dashboard';
 
-@Entity()
-export class User {
-    @ObjectIdColumn()
-    user_id: ObjectId
 
-    @Column()
-    email: string
-
-    @Column()
-    password: string
-
-    @Column((type) => Dashboard)
-    dashboard: Dashboard
+// Defina o esquema para o modelo User
+interface IUser extends Document {
+  email: string;
+  password: string;
+  dashboards: IDashboard[];
 }
 
+const userSchema = new Schema<IUser>({
+  email: {
+    type: String,
+    required: true,
+    unique: true,
+  },
+  password: {
+    type: String,
+    required: true,
+  },
+  dashboards: [dashboardSchema], 
+});
+
+const User = mongoose.model<IUser>('User', userSchema);
+
+export default User;
