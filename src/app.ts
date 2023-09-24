@@ -1,12 +1,13 @@
-const express = require('express')
+const expres = require('express')
 const databse = require('./database')
-const route = require('./routes/UserRoute')
+const routes = require('./routes')
 
-const app = express()
-app.use(express.json());
+const app = expres()
+app.use(expres.json());
 
-app.use('/user', route)
+app.use('/', routes)
 
-app.listen(3000, () => {
-  console.log(`Servidor rodando na porta 3000`);
+app.listen(3100 || 3000, () => {
+  console.log(`Servidor rodando na porta 3100...`);
 });
+

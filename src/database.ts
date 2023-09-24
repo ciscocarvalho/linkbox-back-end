@@ -20,4 +20,4 @@ db.once('open', () => {
   console.log('Conectado Nice!');
 });
 
-module.exports = db ;
+export default db ;

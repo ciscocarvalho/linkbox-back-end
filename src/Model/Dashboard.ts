@@ -1,18 +1,28 @@
 
-import { Schema, Document } from 'mongoose';
+import mongoose,{ Schema, Document } from 'mongoose';
+import { ILink, linkSchema } from './Link';
+import Folder, { IFolder, FolderSchema } from './Folder';
 
-// Esquema para o documento Dashboard
 export interface IDashboard extends Document {
-  title: string;
-  widgets: string[];
+  title: String;
+  link: [ILink];
+  folder: [IFolder]
 }
 
-const dashboardSchema = new Schema<IDashboard>({
+export const dashboardSchema = new Schema<IDashboard>({
   title: {
     type: String,
     required: true
   },
-  widgets: [String],
+  link: {
+    type: [linkSchema],
+    required: false
+  },
+  folder: {
+    type: [FolderSchema],
+    required: false
+  }
 });
-
-export default dashboardSchema;
+ const Dashboard = mongoose.model('Dashboard', dashboardSchema)
+ 
+export default Dashboard

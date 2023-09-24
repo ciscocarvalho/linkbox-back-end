@@ -2,14 +2,14 @@ import { Request, Response } from 'express';
 const express = require('express')
 
 
-import User from '../Model/User'; // Importe o modelo de usuário e subdocumentos
+import User from '../model/User'; // Importe o modelo de usuário e subdocumentos
 
 const router = express.Router();
 
 router.post('/', async (req: Request, res: Response) => {
   try {
-    const { email, password, dashboards } = req.body;
-    const newUser = new User({ email, password, dashboards });
+    const clone = {...req.body};
+    const newUser = new User(clone);
     const savedUser = await newUser.save();
     res.status(201).json(savedUser);
   } catch (error) {
@@ -73,4 +73,4 @@ router.delete('/:id', async (req: Request, res: Response) => {
   }
 });
 
-module.exports = router;
+module.exports = router

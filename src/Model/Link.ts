@@ -1,4 +1,5 @@
-import mongoose, { Schema, Document } from 'mongoose';
+
+import mongoose, { Schema, Document, ObjectId} from 'mongoose';
 
 export interface ILink extends Document {
   name: String;
@@ -6,7 +7,7 @@ export interface ILink extends Document {
   color: String;
 }
 
-const LinkSchema = new Schema({
+export const linkSchema = new Schema({
     name: {
         type: String,
         required: true
@@ -19,6 +20,12 @@ const LinkSchema = new Schema({
         type: String,
         required: true
     },
+    image: {
+        type: String,
+        required: false 
+    }
 });
 
-export default mongoose.model<ILink>('Link', LinkSchema);
+const Link = mongoose.model<ILink>('Link', linkSchema);
+
+export default Link;

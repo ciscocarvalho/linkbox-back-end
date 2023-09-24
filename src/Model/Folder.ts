@@ -1,15 +1,14 @@
 import mongoose, { Schema, Document } from 'mongoose';
-import Link, { ILink } from './Link';
-import LinkSchema from "./Link"
+import { ILink, linkSchema } from './Link';
 
 export interface IFolder extends Document {
   name: String;
   descricao: String;
   color: String;
-  link: ILink[];
+  link: [ILink];
 }
 
-const FolderSchema = new Schema({
+export const FolderSchema = new Schema({
     name: {
         type: String,
         required: true
@@ -22,7 +21,9 @@ const FolderSchema = new Schema({
         type: String,
         required: false
     },
-    link: [LinkSchema]
+    link: [linkSchema]
 });
 
-export default mongoose.model<IFolder>('Folder', FolderSchema);
+const Folder = mongoose.model<IFolder>('Folder', FolderSchema);
+
+export default Folder

@@ -1,13 +1,11 @@
 // UserModel.ts
 import mongoose, { Schema, Document } from 'mongoose';
-import dashboardSchema, {IDashboard} from './Dashboard';
+import {IDashboard, dashboardSchema } from './Dashboard';
 
-
-// Defina o esquema para o modelo User
 interface IUser extends Document {
-  email: string;
-  password: string;
-  dashboards: IDashboard[];
+  email: String;
+  password: String;
+  dashboards: [IDashboard];
 }
 
 const userSchema = new Schema<IUser>({
@@ -20,7 +18,10 @@ const userSchema = new Schema<IUser>({
     type: String,
     required: true,
   },
-  dashboards: [dashboardSchema], 
+  dashboards: {
+    type: [dashboardSchema],
+    required: true
+  }, 
 });
 
 const User = mongoose.model<IUser>('User', userSchema);
