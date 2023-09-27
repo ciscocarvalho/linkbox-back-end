@@ -7,7 +7,7 @@ app.use(expres.json());
 
 app.use('/', routes)
 
-app.listen(3100 || 3000, () => {
+app.listen(3200 || 3000, () => {
   console.log(`Servidor rodando na porta 3100...`);
 });
 

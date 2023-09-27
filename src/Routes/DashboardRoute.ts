@@ -1,10 +1,10 @@
+import DashboardController from '../controller/DashboardController';
 
 
 const express = require('express')
-
-import DashboardController from '../controller/DashboardController';
-
 const router = express.Router();
+
+
 
   router.post('/', DashboardController.post);
 

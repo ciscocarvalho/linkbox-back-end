@@ -2,6 +2,7 @@ import { Request, Response } from "express";
 import User from "../model/User";
 
 class UserController{
+  
     static async post(req: Request, res: Response){
         try {
             const clone = {...req.body};
@@ -14,6 +15,7 @@ class UserController{
           }
 
     }
+
     static async getAll(req: Request, res: Response){
 
         try {
@@ -30,7 +32,7 @@ class UserController{
 
         try {
             const userId = req.params.id;
-            const user = await User.findById(userId);
+            const user = await User.findById(userId, '-password');
             if (!user) {
               return res.status(404).json({ message: 'Usuário não encontrado.' });
             }
