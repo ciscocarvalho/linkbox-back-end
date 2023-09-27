@@ -1,5 +1,5 @@
 
-import mongoose, { Schema, Document, ObjectId} from 'mongoose';
+import mongoose, { Schema, Document} from 'mongoose';
 
 export interface ILink extends Document {
   name: String;
