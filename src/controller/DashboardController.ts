@@ -18,9 +18,6 @@ class DashboardController{
 
           user.dashboards.push(clone);
           await user.save()
-
-          //const newDashboard = new Dashboard(clone);
-          //const savedDashboard = await newDashboard.save();
       
           res.status(201).json("sucesso ao registrar a dashboard"); 
         } catch (error) {

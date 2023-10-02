@@ -21,6 +21,7 @@ class FolderController{
             }
             
             dashboard.folder.push(clone)
+            await dashboard.save()
 
 
             res.status(201).json("Salvo com sucesso: " + dashboard);

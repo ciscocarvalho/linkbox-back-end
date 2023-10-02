@@ -1,20 +1,37 @@
 import {Response, Request} from 'express'
-import Link from '../Model/Link';
+import Link, { ILink } from '../Model/Link';
 import User from '../Model/User';
 
 class LinkController{
    
     static async post(req: Request, res: Response){
 
-        try {
-            const clone = { ...req.body };
-            const newLink = new Link(clone);
-            const savedLink = await newLink.save();
-            res.status(201).json(savedLink);
-          } catch (error) {
-            console.error(error);
-            res.status(500).json({ message: 'Erro ao criar o link.' });
-          }
+      try {
+        const userId = req.params.userId
+        const dashboardId = req.params.dashboardId
+        const clone: ILink = {...req.body};
+
+        const user = await User.findById(userId)
+
+        if(!user){
+          res.status(500).json('usuário não encontrado')
+        }
+        const dashboard = user.dashboards.find((d) => d._id.toString() === dashboardId);
+
+        if (!dashboard) {
+          return res.status(404).json({ error: 'Dashboard não encontrada' });
+        }
+        
+        dashboard.link.push(clone)
+
+        await dashboard.save()
+
+
+        res.status(201).json("Salvo com sucesso: " + dashboard);
+      } catch (error) {
+        console.error(error);
+        res.status(500).json({ message: 'Erro ao criar a pasta.' });
+      }
 
     }
     static async getAllInDashboard(req: Request, res: Response){
@@ -63,7 +80,7 @@ class LinkController{
           return res.status(404).json({ error: 'Dashboard não encontrada' });
         }
 
-        const linkIndex = dashboard.folder.find((f) => f._id.toString() === linkId);
+        const linkIndex = dashboard.link.find((f) => f._id.toString() === linkId);
 
 
         if (!linkIndex) {

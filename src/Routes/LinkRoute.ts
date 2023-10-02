@@ -5,7 +5,7 @@ import LinkController from '../Controller/LinkController';
 const router = express.Router();
 
 
-  router.post('/', LinkController.post)
+  router.post('/userId/:dashboardId', LinkController.post)
 
   router.get('/:userId/:dashboardId', LinkController.getAllInDashboard);
 

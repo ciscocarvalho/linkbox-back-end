@@ -8,7 +8,6 @@ const authRoutes = require('./AuthRoute')
 
 
 router.use('/users', usersRoutes)
-
 router.use('/auth', authRoutes)
 router.use('/dashboards', dashboardRoutes)
 router.use('/folders', folderRoutes)
