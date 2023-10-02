@@ -1,12 +1,10 @@
 
 const express = require('express')
 
-import UserController from '../controller/UserController';
+import UserController from '../Controller/UserController';
 import { checkToken } from '../util/validation';
 
 const router = express.Router();
-
-//router.post('/', UserController.post);
 
 router.get('/', UserController.getAll);
 

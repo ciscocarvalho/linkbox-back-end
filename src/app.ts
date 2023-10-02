@@ -1,13 +1,30 @@
-const expres = require('express')
-const databse = require('./database')
+const express = require('express')
+
+
+import connectToMongoDB from './database'
 const routes = require('./routes')
 
-const app = expres()
-app.use(expres.json());
+const cookieParser = require('cookie-parser');
+
+const app = express()
+app.use(express.json());
+app.use(cookieParser());
+
 
 app.use('/', routes)
 
-app.listen(3200 || 3000, () => {
-  console.log(`Servidor rodando na porta 3100...`);
-});
+async function startServer() {
+  try {
+    await connectToMongoDB();
 
+  } catch (error) {
+    console.error('Erro durante a inicialização da aplicação:', error);
+  }
+}
+
+startServer()
+
+
+app.listen(3000, () => {
+  console.log(`Servidor rodando na porta 3000....`);
+});

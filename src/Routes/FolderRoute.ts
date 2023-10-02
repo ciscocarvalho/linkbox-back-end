@@ -1,21 +1,17 @@
 
 const express = require('express')
 
-import FolderController from '../controller/FolderController';
+import FolderController from '../Controller/FolderController';
 
 const router = express.Router();
 
 
-  router.post('/', FolderController.post);
+  router.post('/:userId/:dashboardId', FolderController.post);
 
-  router.get('/', FolderController.getAll);
+  router.get('/:userId/:dashboardId', FolderController.getAll);
 
+  router.put('/:userId/:dashboardId/:folderId', FolderController.put);
 
-  router.get('/:id', FolderController.getById);
-
-
-  router.put('/:id', FolderController.put);
-
-  router.delete('/:id',FolderController.delete);
+  router.delete('/:userId/:dashboardId/:folderId',FolderController.delete);
 
   module.exports = router

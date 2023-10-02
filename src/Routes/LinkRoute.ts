@@ -1,21 +1,17 @@
 const express = require('express')
 
-import LinkController from '../controller/LinkController';
+import LinkController from '../Controller/LinkController';
 
 const router = express.Router();
 
 
-router.post('/', LinkController.post)
+  router.post('/', LinkController.post)
 
-  router.get('/', LinkController.getAll);
+  router.get('/:userId/:dashboardId', LinkController.getAllInDashboard);
 
+  router.put('/:userId/:dashboardId/:id', LinkController.put);
 
-  router.get('/:id', LinkController.getById);
-
-
-  router.put('/:id', LinkController.put);
-
-  router.delete('/:id', LinkController.delete);
+  router.delete('/:userId/:dashboardId/:id', LinkController.delete);
 
 
   module.exports = router

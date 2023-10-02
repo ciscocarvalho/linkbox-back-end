@@ -2,7 +2,7 @@
 import mongoose, { Schema, Document } from 'mongoose';
 import {IDashboard, dashboardSchema } from './Dashboard';
 
-interface IUser extends Document {
+export interface IUser extends Document {
   email: String;
   password: String;
   dashboards: [IDashboard];
@@ -20,7 +20,7 @@ const userSchema = new Schema<IUser>({
   },
   dashboards: {
     type: [dashboardSchema],
-    required: true
+    required: false
   }, 
 });
 

@@ -1,16 +1,15 @@
-import DashboardController from '../controller/DashboardController';
+import DashboardController from '../Controller/DashboardController';
 
 
 const express = require('express')
 const router = express.Router();
 
 
+  router.post('/:userId', DashboardController.post)
 
-  router.post('/', DashboardController.post);
+  router.get('/:userId', DashboardController.getAll);
 
-  router.get('/', DashboardController.getAll);
-
-  router.get('/:id', DashboardController.getById);
+  router.get('/:userId', DashboardController.getById);
 
   router.put('/:id', DashboardController.put);
 

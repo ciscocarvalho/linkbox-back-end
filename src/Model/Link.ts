@@ -5,6 +5,7 @@ export interface ILink extends Document {
   name: String;
   descricao: String;
   color: String;
+  image: String;
 }
 
 export const linkSchema = new Schema({

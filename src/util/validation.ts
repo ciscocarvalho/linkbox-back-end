@@ -2,39 +2,20 @@ import { Request, Response, NextFunction } from "express"
 const jwt = require('jsonwebtoken')
 const env = require('dotenv')
 
-
-export function ExistOrError(valor, msg){
-    if(!valor) throw msg
-}
-
-export function EqualsOrErro(valor1,valor2, msg){
-    if(valor1 !== valor2) throw msg
-}
-
 export function checkToken(req: Request, res: Response, Next: NextFunction){
 
-    const authHeader = req.headers['authorization']
-    const token = authHeader && authHeader.split(" ")[1]
+    const token = req.cookies.token;
 
-    if(!token){
-        return res.status(401).json({msg: "Acesso Negado"})
+  if (!token) {
+    return res.status(403).send('Token não fornecido.');
+  }
+
+  jwt.verify(token, process.env.SECRET, (err, decoded) => {
+    if (err) {
+      return res.status(401).send('Token inválido.');
     }
-
-    try {
-        const secret = process.env.SECRET
-
-        jwt.verify(token, secret)
-        Next()
-    } catch (error) {
-        res.status(400).json({msg: "Token inválido"})
-    }
+    
+    Next();
+    })
 
 }
-
-//export default ExistOrError
-
-/*module.exports = {
-    ExistOrError,
-    checkToken,
-    EqualsOrErro
-}*/

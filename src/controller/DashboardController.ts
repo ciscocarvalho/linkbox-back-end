@@ -1,16 +1,28 @@
-import Dashboard from "../model/Dashboard";
+import Dashboard, { IDashboard } from "../Model/Dashboard";
 import { Request, Response } from "express";
+import User from "../Model/User";
 
 class DashboardController{
 
 
     static async post(req: Request, res: Response) {
         try {
-          const clone = { ...req.body };
-          const newDashboard = new Dashboard(clone);
-          const savedDashboard = await newDashboard.save();
+          const userId = req.params.userId
+          const clone: IDashboard = { ...req.body };
+          const user = await User.findById(userId)
+
+
+          if(!user){
+            res.status(500).json('usuário não encontrado')
+          }
+
+          user.dashboards.push(clone);
+          await user.save()
+
+          //const newDashboard = new Dashboard(clone);
+          //const savedDashboard = await newDashboard.save();
       
-          res.status(201).json(savedDashboard); 
+          res.status(201).json("sucesso ao registrar a dashboard"); 
         } catch (error) {
           console.error(error);
           res.status(500).json({ message: 'Erro ao criar a dashboard.' });
@@ -19,8 +31,16 @@ class DashboardController{
       
     static async getAll(req: Request, res: Response){
         try {
-            const dashboard = await Dashboard.find();
-            res.json(dashboard);
+            const userId = req.params.userId
+            const user = await User.findById(userId)
+
+            if(!user){
+              res.status(500).json('usuário não encontrado')
+            }
+
+            const dashboards = user.dashboards;
+
+            res.json(dashboards);
           } catch (error) {
             console.error(error);
             res.status(500).json({ message: 'Erro ao buscar a dashboard.' });

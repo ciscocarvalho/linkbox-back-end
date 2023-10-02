@@ -1,53 +1,46 @@
-import User from "../model/User";
-import {Request, Response} from 'express'
-import { ExistOrError } from "../util/validation";
-const bcrypt = require('bcrypt')
-const jwt = require('jsonwebtoken')
+import User, { IUser } from "../Model/User";
+const bcrypt = require("bcrypt");
+const jwt = require("jsonwebtoken");
 
-class AuthController{
-    
-    static async signup(req: Request, res: Response){
-        try {
-            const clone = {...req.body};
-            const newUser = new User(clone);
-            const savedUser = await newUser.save();
-            res.status(201).json(savedUser);
+class AuthController {
+  static user: IUser;
 
+  constructor(user) {
+    AuthController.user = user;
+  }
 
-          } catch (error) {
-            console.error(error);
-            res.status(500).json({ message: 'Erro ao criar o usuário.' });
-          }
+  static genToken(user) {
+    const token = jwt.sign({ id: user.id }, process.env.SECRET, {
+      expiresIn: "1h",
+    });
+    return token;
+  }
 
-    }
-
-    static async signin(req: Request, res: Response){
-        const {email, password} = req.body
-
-    ExistOrError(email, "Email é obrigatório")
-    ExistOrError(password, "Senha é obrigatória")
-
-    const user = await User.findOne({email: email})
-
-    ExistOrError(user, "Usuário não encontrado")
-
-    const checkPassword = await bcrypt.compare(password, user.password)
-    ExistOrError(checkPassword, "Senha ou email não encontrados")
-
+  async signup(userT): Promise<any> {
+    console.log("2");
 
     try {
-        const secret = process.env.SECRET
+      const newUser = new User(userT);
+      console.log("4");
+      const savedUser = await newUser.save();
+      console.log("5");
 
-        const token = jwt.sign({
-            id: user.id
-        }, secret)
+      return newUser;
+    } catch (err) {
+      throw new Error(err.message);
+    }
+  }
 
-        res.status(200).json({msg: "sucesso", token})
-    } catch (error) {
-        console.log(error)
-        res.status(500).json({msg: "Ocorreu um erro"})
+  async signin(email, password): Promise<any> {
+    const user = await User.findOne({ email: email });
+
+    if (!user) {
+      throw "error usuário não encontrado";
     }
-    }
+    const token = AuthController.genToken(user);
+
+    return { token, userData: { email } };
+  }
 }
 
-export default AuthController
+export default AuthController;

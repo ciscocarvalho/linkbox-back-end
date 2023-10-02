@@ -1,7 +1,9 @@
 import {Response, Request} from 'express'
-import Link from '../model/Link';
+import Link from '../Model/Link';
+import User from '../Model/User';
 
 class LinkController{
+   
     static async post(req: Request, res: Response){
 
         try {
@@ -15,64 +17,99 @@ class LinkController{
           }
 
     }
-    static async getAll(req: Request, res: Response){
+    static async getAllInDashboard(req: Request, res: Response){
 
-        try {
-            const links = await Link.find();
-            res.json(links);
-          } catch (error) {
-            console.error(error);
-            res.status(500).json({ message: 'Erro ao buscar links.' });
-          }
+      try {
+        const userId = req.params.userId
+        const dashboardId = req.params.dashboardId
+        const user = await User.findById(userId)
+        
+        if(!user){
+          res.status(500).json('usuário não encontrado')
+        }
 
-    }
+        const dashboard = user.dashboards.find((d) => d._id.toString() === dashboardId);
 
-    static async getById(req: Request, res: Response){
+        if (!dashboard) {
+          return res.status(404).json({ error: 'Dashboard não encontrada' });
+        }
+        const links = dashboard.link
 
-        try {
-            const LinkId = req.params.id;
-            const link = await Link.findById(LinkId);
-            if (!link) {
-              return res.status(404).json({ message: 'Link não encontrado.' });
-            }
-            res.json(link);
-          } catch (error) {
-            console.error(error);
-            res.status(500).json({ message: 'Erro ao buscar o link' });
-          }
+          res.json(links);
+        } catch (error) {
+          console.error(error);
+          res.status(500).json({ message: 'Erro ao buscar a pasta.' });
+        }
 
     }
+
     static async put(req: Request, res: Response){
 
-        try {
-            const linkId = req.params.id;
-            const updatedLinkData = req.body;
-            const updatedLink = await Link.findByIdAndUpdate(linkId, updatedLinkData, {
-              new: true,
-            });
-            if (!updatedLink) {
-              return res.status(404).json({ message: 'Link não encontrado.' });
-            }
-            res.json(updatedLink);
-          } catch (error) {
-            console.error(error);
-            res.status(500).json({ message: 'Erro ao atualizar o Link.' });
-          }
+      try {
+        const userId = req.params.userId
+        const dashboardId = req.params.dashboardId
+        const linkId = req.params.id;
+        const updatedLinkData = req.body;
+
+        const user = await User.findById(userId)
+      
+        if(!user){
+          res.status(500).json('usuário não encontrado')
+        }
+
+        const dashboard = user.dashboards.find((d) => d._id.toString() === dashboardId);
+
+        if (!dashboard) {
+          return res.status(404).json({ error: 'Dashboard não encontrada' });
+        }
+
+        const linkIndex = dashboard.folder.find((f) => f._id.toString() === linkId);
+
+
+        if (!linkIndex) {
+          return res.status(404).json({ message: 'pasta não encontrada.' });
+        }
+        linkIndex.updateOne({linkId: linkIndex.id}, {updatedLinkData})
+
+        res.json(updatedLinkData);
+      } catch (error) {
+        console.error(error);
+        res.status(500).json({ message: 'Erro ao atualizar a pasta.' });
+      }
 
     }
     static async delete(req: Request, res: Response){
 
-        try {
-            const linkId = req.params.id;
-            const deletedLink = await Link.findByIdAndRemove(linkId);
-            if (!deletedLink) {
-              return res.status(404).json({ message: 'Link não encontrado.' });
-            }
-            res.json(deletedLink);
-          } catch (error) {
-            console.error(error);
-            res.status(500).json({ message: 'Erro ao excluir o link.' });
-          }
+      try {
+        const userId = req.params.userId
+        const dashboardId = req.params.dashboardId
+        const linkId = req.params.id;
+
+        const user = await User.findById(userId)
+      
+        if(!user){
+          res.status(500).json('usuário não encontrado')
+        }
+
+        const dashboard = user.dashboards.find((d) => d._id.toString() === dashboardId);
+
+        if (!dashboard) {
+          return res.status(404).json({ error: 'Dashboard não encontrada' });
+        }
+
+        const linkIndex = dashboard.folder.find((f) => f._id.toString() === linkId);
+
+
+        if (!linkIndex) {
+          return res.status(404).json({ message: 'pasta não encontrada.' });
+        }
+        linkIndex.deleteOne({linkId: linkIndex.id})
+
+        res.json("documento removido");
+        } catch (error) {
+          console.error(error);
+          res.status(500).json({ message: 'Erro ao excluir a pasta.' });
+        }
         
     }
 }
