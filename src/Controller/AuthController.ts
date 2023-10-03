@@ -1,6 +1,6 @@
 import User, { IUser } from "../Model/User";
-const bcrypt = require("bcrypt");
-const jwt = require("jsonwebtoken");
+import bcrypt from "bcrypt";
+import jwt from "jsonwebtoken";
 
 class AuthController {
   static user: IUser;

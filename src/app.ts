@@ -1,10 +1,7 @@
-const express = require('express')
-
-
-import connectToMongoDB from './database'
-const routes = require('./Routes')
-
-const cookieParser = require('cookie-parser');
+import express from 'express';
+import connectToMongoDB from './database';
+import routes from './Routes/index';
+import cookieParser from 'cookie-parser';
 
 const app = express()
 app.use(express.json());

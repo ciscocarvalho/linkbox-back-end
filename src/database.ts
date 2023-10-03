@@ -1,9 +1,7 @@
-import { Connection } from "mongoose"
+import mongoose, { Connection } from "mongoose"
+import dotenv from 'dotenv'
 
-const dotenv = require('dotenv')
 dotenv.config()
-const mongoose = require('mongoose')
-
 
 const DATABASE_PASSWORD = process.env.DATABASE_PASSWORD
 const DATABASE_USER = process.env.DATABASE_USER
@@ -21,11 +19,11 @@ const mongoOptions = {
 async function connectToMongoDB(): Promise<Connection> {
   try {
     // Conectar ao MongoDB
-    const connection = await mongoose.connect(mongoURL, mongoOptions);
+    const connection = await mongoose.connect(mongoURL, mongoOptions as any);
 
     console.log('Conexão com o MongoDB estabelecida com sucesso.');
 
-    return connection;
+    return connection as any;
   } catch (error) {
     console.error('Erro ao conectar ao MongoDB:', error);
     throw error;

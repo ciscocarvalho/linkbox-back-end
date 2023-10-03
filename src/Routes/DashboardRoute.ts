@@ -1,7 +1,7 @@
 import DashboardController from '../Controller/DashboardController';
 
 
-const express = require('express')
+import express from 'express'
 const router = express.Router();
 
 
@@ -17,4 +17,4 @@ const router = express.Router();
 
   router.delete('/:id', DashboardController.delete);
 
-module.exports = router
+export default router

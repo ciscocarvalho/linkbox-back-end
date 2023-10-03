@@ -1,8 +1,8 @@
-const express = require("express");
+import express from "express";
 
 import { Request, Response } from "express";
 
-const User = require("../Model/User");
+import User from "../Model/User";
 
 const router = express.Router();
 
@@ -44,4 +44,4 @@ router.post("/signin", async (req: Request, res: Response) => {
  * 
  */
 
-module.exports = router;
+export default router;

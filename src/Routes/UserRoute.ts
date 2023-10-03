@@ -1,5 +1,5 @@
 
-const express = require('express')
+import express from 'express'
 
 import UserController from '../Controller/UserController';
 import { checkToken } from '../util/validation';
@@ -14,4 +14,4 @@ router.put('/:id', UserController.put);
 
 router.delete('/:id', UserController.delete);
 
-module.exports = router
+export default router

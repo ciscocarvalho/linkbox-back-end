@@ -1,4 +1,4 @@
-const express = require('express')
+import express from 'express'
 
 import LinkController from '../Controller/LinkController';
 
@@ -14,4 +14,4 @@ const router = express.Router();
   router.delete('/:userId/:dashboardId/:id', LinkController.delete);
 
 
-  module.exports = router
+  export default router

@@ -1,5 +1,5 @@
 
-const express = require('express')
+import express from 'express'
 
 import FolderController from '../Controller/FolderController';
 
@@ -14,4 +14,4 @@ const router = express.Router();
 
   router.delete('/:userId/:dashboardId/:folderId',FolderController.delete);
 
-  module.exports = router
+  export default router

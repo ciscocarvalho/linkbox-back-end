@@ -1,10 +1,10 @@
-const express = require('express')
+import express from 'express'
 const router = express.Router()
-const usersRoutes = require('./UserRoute')
-const dashboardRoutes = require('./DashboardRoute')
-const folderRoutes = require('./FolderRoute')
-const linkRoutes = require('./LinkRoute')
-const authRoutes = require('./AuthRoute')
+import usersRoutes from './UserRoute'
+import dashboardRoutes from './DashboardRoute'
+import folderRoutes from './FolderRoute'
+import linkRoutes from './LinkRoute'
+import authRoutes from './AuthRoute'
 
 
 router.use('/users', usersRoutes)
@@ -13,5 +13,4 @@ router.use('/dashboards', dashboardRoutes)
 router.use('/folders', folderRoutes)
 router.use('/links', linkRoutes)
 
-
-module.exports = router
+export default router

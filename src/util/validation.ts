@@ -1,6 +1,6 @@
 import { Request, Response, NextFunction } from "express"
-const jwt = require('jsonwebtoken')
-const env = require('dotenv')
+import jwt from 'jsonwebtoken'
+import env from 'dotenv'
 
 export function checkToken(req: Request, res: Response, Next: NextFunction){
 
