@@ -2,7 +2,7 @@ const express = require('express')
 
 
 import connectToMongoDB from './database'
-const routes = require('./routes')
+const routes = require('./Routes')
 
 const cookieParser = require('cookie-parser');
 
