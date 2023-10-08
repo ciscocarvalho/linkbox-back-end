@@ -1,0 +1,637 @@
+openapi: 3.1.0
+info:
+  title: User API
+  version: 0.0.1
+paths:
+  /auth/signup:
+    post:
+      summary: Sign user up
+      responses:
+        '201':
+          description: Success
+          content:
+            application/json:
+              schema:
+                description: Email of saved user
+                type: String
+        '400':
+          description: Error
+          content:
+            text/plain:
+              description: Error message
+              type: String
+  /auth/signin:
+    post:
+      summary: Sign user in
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                email:
+                  type: String,
+                password:
+                  type: String,
+              required:
+                - email
+                - password
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  auth: true
+                  user:
+                    type: object
+                    properties:
+                      email:
+                        type: string
+        '401':
+          description: Error
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  auth: false
+                  token: null
+                  message:
+                    description: Error message
+                    type: string
+  /users:
+    get:
+      summary: Get all users
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/User"
+        '500':
+          description: Error
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message: Erro ao buscar usuários.
+  /users/{id}:
+    get:
+      summary: Get user by id
+      parameters:
+        - $ref: "#/components/parameters/id"
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/User"
+        '500':
+          description: Error
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message: Erro ao buscar o usuário.
+    put:
+      summary: Update user by id
+      parameters:
+        - $ref: "#/components/parameters/id"
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/User"
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/User"
+        '404':
+          $ref: "#/components/responses/UserNotFound"
+        '500':
+          description: Error
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message: Erro ao atualizar o usuário.
+    delete:
+      summary: Delete user by id
+      parameters:
+        - $ref: "#/components/parameters/id"
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/User"
+        '404':
+          $ref: "#/components/responses/UserNotFound"
+        '500':
+          description: Error
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message: Erro ao excluir o usuário.
+  /dashboards/{userId}:
+    post:
+      parameters:
+        - $ref: "#/components/parameters/id"
+      responses:
+        '201':
+          description: Success
+          content:
+            application/json:
+              schema: sucesso ao registrar a dashboard
+        '500':
+          description: Error
+          content:
+            application/json:
+              schema:
+                oneOf:
+                  - usuário não encontrado
+                  - type: object
+                    properties:
+                      message: Erro ao criar a dashboard.
+    get:
+      parameters:
+        - $ref: "#/components/parameters/id"
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Dashboard"
+        '404':
+          $ref: "#/components/responses/DashboardNotFound"
+        '500':
+          description: Error
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message: Erro ao buscar a pasta
+  /dashboards/{id}:
+    put:
+      parameters:
+        - $ref: "#/components/parameters/id"
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Dashboard"
+        '404':
+          $ref: "#/components/responses/DashboardNotFound"
+        '500':
+          description: Error
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message: Erro ao atualizar a dashboard.
+    delete:
+      parameters:
+        - $ref: "#/components/parameters/id"
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Dashboard"
+        '404':
+          $ref: "#/components/responses/DashboardNotFound"
+        '500':
+          description: Error
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message: Erro ao excluir a pasta.
+  /dashboards/{dashboardId}/links/{linkId}:
+    put:
+      parameters:
+        - dashboardId:
+          $ref: "#/components/parameters/id"
+        - linkId:
+          $ref: "#/components/parameters/id"
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/Link"
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Dashboard"
+        '404':
+          description: Error
+          content:
+            application/json:
+              schema:
+                oneOf:
+                  - type: object
+                    properties:
+                      message: Dashboard não encontrado.
+                  - type: object
+                    properties:
+                      message: Link não encontrado.
+        '500':
+          description: Error
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message: Erro ao atualizar o subdocumento link.
+  /folders/{userId}/{dashboardId}:
+    post:
+      parameters:
+        - userId:
+          $ref: "#/components/parameters/id"
+        - dashboardId:
+          $ref: "#/components/parameters/id"
+      responses:
+        '201':
+          description: Success
+          content:
+            application/json:
+              schema:
+                description: "Salvo com sucesso: {dashboard}"
+                type: String
+        '404':
+          description: Error
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error: Dashboard não encontrada
+        '500':
+          description: Error
+          content:
+            application/json:
+              schema:
+                oneOf:
+                  - usuário não encontrado
+                  - type: object
+                    properties:
+                      message: Erro ao criar a pasta.
+    get:
+      parameters:
+        - userId:
+          $ref: "#/components/parameters/id"
+        - dashboardId:
+          $ref: "#/components/parameters/id"
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Folder"
+        '404':
+          description: Error
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error: Dashboard não encontrada
+        '500':
+          description: Error
+          content:
+            application/json:
+              schema:
+                oneOf:
+                  - usuário não encontrado
+                  - type: object
+                    properties:
+                      message: Erro ao buscar a pasta.
+  /folders/{userId}/{dashboardId}/{folderId}:
+    put:
+      parameters:
+        - userId:
+          $ref: "#/components/parameters/id"
+        - dashboardId:
+          $ref: "#/components/parameters/id"
+        - id:
+          $ref: "#/components/parameters/id"
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Folder"
+        '404':
+          description: Error
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message: pasta não encontrada.
+        '500':
+          description: Error
+          content:
+            application/json:
+              schema:
+                oneOf:
+                  - usuário não encontrado
+                  - type: object
+                    properties:
+                      message: Erro ao atualizar a pasta.
+    delete:
+      parameters:
+        - userId:
+          $ref: "#/components/parameters/id"
+        - dashboardId:
+          $ref: "#/components/parameters/id"
+        - id:
+          $ref: "#/components/parameters/id"
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema: documento removido
+        '404':
+          description: Error
+          content:
+            application/json:
+              schema:
+                oneOf:
+                  - type: object
+                    properties:
+                      error: Dashboard não encontrada
+                  - type: object
+                    properties:
+                      message: pasta não encontrada.
+        '500':
+          description: Error
+          content:
+            application/json:
+              schema:
+                oneOf:
+                  - usuário não encontrado
+                  - type: object
+                    properties:
+                      message: Erro ao excluir a pasta.
+  /{userId}/{dashboardId}:
+    post:
+      parameters:
+        - userId:
+          $ref: "#/components/parameters/id"
+        - dashboardId:
+          $ref: "#/components/parameters/id"
+      responses:
+        '201':
+          description: Success
+          content:
+            application/json:
+              schema:
+                description: "Salvo com sucesso: {dashboard}"
+                type: String
+        '404':
+          description: Error
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error: Dashboard não encontrada
+        '500':
+          description: Error
+          content:
+            application/json:
+              schema:
+                oneOf:
+                  - usuário não encontrado
+                  - type: object
+                    properties:
+                      message: Erro ao criar a pasta.
+    get:
+      parameters:
+        - userId:
+          $ref: "#/components/parameters/id"
+        - dashboardId:
+          $ref: "#/components/parameters/id"
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Link"
+        '404':
+          description: Error
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error: Dashboard não encontrada
+        '500':
+          description: Error
+          content:
+            application/json:
+              schema:
+                oneOf:
+                  - usuário não encontrado
+                  - type: object
+                    properties:
+                      message: Erro ao buscar a pasta.
+  /{userId}/{dashboardId}/{id}:
+    put:
+      parameters:
+        - userId:
+          $ref: "#/components/parameters/id"
+        - dashboardId:
+          $ref: "#/components/parameters/id"
+        - id:
+          $ref: "#/components/parameters/id"
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/Link"
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Link"
+        '404':
+          description: Error
+          content:
+            application/json:
+              schema:
+                oneOf:
+                  - type: object
+                    properties:
+                      error: Dashboard não encontrada
+                  - type: object
+                    properties:
+                      message: pasta não encontrada.
+        '500':
+          description: Error
+          content:
+            application/json:
+              schema:
+                oneOf:
+                  - usuário não encontrado
+                  - type: object
+                    properties:
+                      message: Erro ao atualizar a pasta.
+    delete:
+      parameters:
+        - userId:
+          $ref: "#/components/parameters/id"
+        - dashboardId:
+          $ref: "#/components/parameters/id"
+        - id:
+          $ref: "#/components/parameters/id"
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema: documento removido
+        '404':
+          description: Error
+          content:
+            application/json:
+              schema:
+                oneOf:
+                  - type: object
+                    properties:
+                      error: Dashboard não encontrada
+                  - type: object
+                    properties:
+                      message: 'pasta não encontrada.'
+
+        '500':
+          description: Error
+          content:
+            application/json:
+              schema:
+                oneOf:
+                  - usuário não encontrado
+                  - type: object
+                    properties:
+                      message: Erro ao excluir a pasta.
+components:
+  parameters:
+    id:
+      name: id
+      in: path
+      schema:
+        type: integer
+  responses:
+    DashboardNotFound:
+      description: Error
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              message: Dashboard não encontrada.
+    UserNotFound:
+      description: Error
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              message: Usuário não encontrado.
+  schemas:
+    Link:
+      type: object
+      properties:
+        name:
+          type: String
+        descricao:
+          type: String
+        color:
+          type: String
+        image:
+          type: String
+      required:
+        - name
+        - color
+    Folder:
+      type: object
+      properties:
+        name:
+          type: String
+        descricao:
+          type: String
+        color:
+          type: String
+        link:
+          type: array
+          items:
+            $ref: "#/components/schemas/Link"
+      required:
+        - name
+    Dashboard:
+      type: object
+      properties:
+        title:
+          type: String
+        link:
+          type: array
+          items:
+            $ref: "#/components/schemas/Link"
+        folder:
+          type: array
+          items:
+            $ref: "#/components/schemas/Folder"
+      required:
+        - title
+    User:
+      type: object
+      properties:
+        email:
+          type: String,
+        password:
+          type: String,
+        dashboards:
+          type: array
+          items:
+            $ref: "#/components/schemas/Dashboard"
+      required:
+        - email
+        - password
+        - dashboards
