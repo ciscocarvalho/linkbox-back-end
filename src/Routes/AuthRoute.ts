@@ -40,8 +40,4 @@ router.post("/signin", async (req: Request, res: Response) => {
   }
 });
 
-/**
- * 
- */
-
 export default router;
