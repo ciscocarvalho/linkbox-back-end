@@ -1,7 +1,9 @@
 import { Request, Response } from "express";
-import User from "../Model/User";
+import User, { IUser } from "../Model/User";
 
 class UserController {
+  static user: IUser;
+
   static async post(req: Request, res: Response) {
     try {
       const clone = { ...req.body };
@@ -14,13 +16,13 @@ class UserController {
     }
   }
 
-  static async getAll(req: Request, res: Response) {
+  static async getAll() {
     try {
       const users = await User.find();
-      res.json(users);
+      console.log(users)
+      return users
     } catch (error) {
-      console.error(error);
-      res.status(500).json({ message: "Erro ao buscar usuários." });
+      throw new Error(error)  
     }
   }
 
