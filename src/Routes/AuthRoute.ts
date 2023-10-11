@@ -34,14 +34,10 @@ router.post("/signin", async (req: Request, res: Response) => {
       sameSite: "strict",
       secure: false,
     });
-    res.json({ auth: true, user: userData /** token: token */ });
+    res.json({ auth: true, user: userData, token: token /** token: token */ });
   } catch (err) {
     res.status(401).send({ auth: false, token: null, message: err.message });
   }
 });
-
-/**
- * 
- */
 
 export default router;

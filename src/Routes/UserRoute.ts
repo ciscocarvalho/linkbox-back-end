@@ -6,7 +6,10 @@ import { checkToken } from '../util/validation';
 
 const router = express.Router();
 
-router.get('/', UserController.getAll);
+router.get('/', async (req, res) =>{
+    const u = await UserController.getAll()
+    res.status(200).json(u)
+});
 
 router.get('/:id',checkToken, UserController.getById);
 
