@@ -37,7 +37,7 @@ class AuthController {
     }
     const token = AuthController.genToken(user);
 
-    return { token, userData: { email } };
+    return { token, userData: email  };
   }
 }
 
