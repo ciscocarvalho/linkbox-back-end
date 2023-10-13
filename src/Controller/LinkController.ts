@@ -3,47 +3,40 @@ import Link, { ILink } from "../Model/Link";
 import User from "../Model/User";
 
 class LinkController {
-  static async post(req: Request, res: Response) {
+  static async post(userId,dashboardId,linkData) {
     try {
-      const userId = req.params.userId;
-      const dashboardId = req.params.dashboardId;
-      const clone: ILink = { ...req.body };
+
     
       const user = await User.findById(userId);
     
       if (!user) {
-        return res.status(500).json("Usuário não encontrado");
+        throw "Usuário não encontrado"
       }
       const dashboard = user.dashboards.find(
         (d) => d._id.toString() === dashboardId
       );
     
       if (!dashboard) {
-        return res.status(404).json({ error: "Dashboard não encontrada" });
+       throw "Dashboard não encontrada" 
       }
     
-      dashboard.link.push(clone);
+      dashboard.link.push(linkData);
     
-      
       await user.save();
     
-      // Agora, vamos buscar o dashboard atualizado do banco de dados
-      const updatedDashboard = await User.findById(userId);
-    
-      res.status(201).json("Salvo com sucesso: " + updatedDashboard);
+      return dashboard
     } catch (error) {
       console.error(error);
-      res.status(500).json({ message: "Erro ao criar a pasta." });
+      throw "Erro ao criar a pasta."
     }
   }
-  static async getAllInDashboard(req: Request, res: Response) {
+  static async getAllInDashboard(userId, dashboardId) {
     try {
-      const userId = req.params.userId;
-      const dashboardId = req.params.dashboardId;
+     
       const user = await User.findById(userId);
 
       if (!user) {
-        res.status(500).json("usuário não encontrado");
+       throw "usuário não encontrado"
       }
 
       const dashboard = user.dashboards.find(
@@ -51,28 +44,27 @@ class LinkController {
       );
 
       if (!dashboard) {
-        return res.status(404).json({ error: "Dashboard não encontrada" });
+        throw "Dashboard não encontrada"
       }
       const links = dashboard.link;
 
-      res.json(links);
+      return links
+
     } catch (error) {
       console.error(error);
-      res.status(500).json({ message: "Erro ao buscar a pasta." });
+     throw "Erro ao buscar a pasta."
     }
   }
 
-  static async put(req: Request, res: Response) {
+  static async put(userId,dashboardId,linkId, updatedLinkData) {
     try {
-      const userId = req.params.userId;
-      const dashboardId = req.params.dashboardId;
-      const linkId = req.params.id;
-      const updatedLinkData = req.body;
+      
+      
     
       const user = await User.findById(userId);
     
       if (!user) {
-        return res.status(500).json("Usuário não encontrado");
+        throw "Usuário não encontrado"
       }
     
       const dashboard = user.dashboards.find(
@@ -80,15 +72,17 @@ class LinkController {
       );
     
       if (!dashboard) {
-        return res.status(404).json({ error: "Dashboard não encontrada" });
+       throw "Dashboard não encontrada"
       }
     
       
-      //@ts-ignore
-      const link = dashboard.link.id(linkId);
+     
+      const link = dashboard.link.find(
+        (l) => l._id.toString() === linkId
+      );
     
       if (!link) {
-        return res.status(404).json({ message: "Link não encontrado." });
+        throw "Link não encontrado."
       }
     
       
@@ -97,22 +91,19 @@ class LinkController {
      
       await user.save();
     
-      res.json(link);
+      return link
+
     }catch (error) {
       console.error(error);
-      res.status(500).json({ message: "Erro ao atualizar a pasta." });
+      throw "Erro ao atualizar a pasta."
     }
   }
-  static async delete(req: Request, res: Response) {
+  static async delete(userId, dashboardId, linkId) {
     try {
-      const userId = req.params.userId;
-      const dashboardId = req.params.dashboardId;
-      const linkId = req.params.id;
-
       const user = await User.findById(userId);
 
       if (!user) {
-        res.status(500).json("usuário não encontrado");
+       throw "usuário não encontrado"
       }
 
       const dashboard = user.dashboards.find(
@@ -120,7 +111,7 @@ class LinkController {
       );
 
       if (!dashboard) {
-        return res.status(404).json({ error: "Dashboard não encontrada" });
+       throw "Dashboard não encontrada"
       }
 
       const linkIndex = dashboard.folder.find(
@@ -128,14 +119,17 @@ class LinkController {
       );
 
       if (!linkIndex) {
-        return res.status(404).json({ message: "pasta não encontrada." });
+        throw "pasta não encontrada."
       }
-      linkIndex.deleteOne({ linkId: linkIndex.id });
 
-      res.json("documento removido");
+      linkIndex.deleteOne({ linkId: linkIndex.id });
+      
+      await user.save()
+
+      return linkIndex
     } catch (error) {
       console.error(error);
-      res.status(500).json({ message: "Erro ao excluir a pasta." });
+      throw "Erro ao excluir a pasta."
     }
   }
 }
