@@ -10,6 +10,7 @@ router.post("/:userId", async (req: Request, res: Response) => {
     const userId = req.params.userId;
     const clone: IDashboard = { ...req.body };
     const dashboardSaved = await DashboardController.post(userId, clone);
+    console.log('030')
     res.status(200).json(dashboardSaved);
   } catch (error) {
     res.status(400).json({ msg: "erro ao salvar a dashboard" });

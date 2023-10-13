@@ -1,129 +1,122 @@
-import Folder, { IFolder } from "../Model/Folder";
-import { Request, Response } from "express";
+
 import User from "../Model/User";
 
-class FolderController{
-    static async post(req: Request, res: Response){
-        try {
-            const userId = req.params.userId
-            const dashboardId = req.params.dashboardId
-            const clone: IFolder = {...req.body};
+class FolderController {
+  static async post(userId, dashboardId, clone) {
+    try {
+      const user = await User.findById(userId);
 
-            const user = await User.findById(userId)
+      if (!user) {
+        throw "erro ao encontrar o usuário";
+      }
+      const dashboard = user.dashboards.find(
+        (d) => d._id.toString() === dashboardId
+      );
 
-            if(!user){
-              res.status(500).json('usuário não encontrado')
-            }
-            const dashboard = user.dashboards.find((d) => d._id.toString() === dashboardId);
-  
-            if (!dashboard) {
-              return res.status(404).json({ error: 'Dashboard não encontrada' });
-            }
-            
-            dashboard.folder.push(clone)
-            await dashboard.save()
+      if (!dashboard) {
+        throw "erro ao encontrar a dashboard";
+      }
 
+      dashboard.folder.push(clone);
+      await user.save();
 
-            res.status(201).json("Salvo com sucesso: " + dashboard);
-          } catch (error) {
-            console.error(error);
-            res.status(500).json({ message: 'Erro ao criar a pasta.' });
-          }
-
+      return dashboard;
+    } catch (error) {
+      console.error(error);
+      throw error;
     }
-    static async getAll(req: Request, res: Response){
+  }
+  static async getAll(userId, dashboardId) {
+    try {
+      const user = await User.findById(userId);
 
-        try {
-          const userId = req.params.userId
-          const dashboardId = req.params.dashboardId
-          const user = await User.findById(userId)
-          
-          if(!user){
-            res.status(500).json('usuário não encontrado')
-          }
+      if (!user) {
+        throw "usuário não encontrado";
+      }
 
-          const dashboard = user.dashboards.find((d) => d._id.toString() === dashboardId);
+      const dashboard = user.dashboards.find(
+        (d) => d._id.toString() === dashboardId
+      );
 
-          if (!dashboard) {
-            return res.status(404).json({ error: 'Dashboard não encontrada' });
-          }
-          const folders = dashboard.folder
+      if (!dashboard) {
+        throw "Dashboard não encontrada";
+      }
+      const folders = dashboard.folder;
 
-            res.json(folders);
-          } catch (error) {
-            console.error(error);
-            res.status(500).json({ message: 'Erro ao buscar a pasta.' });
-          }
-
+      return folders;
+    } catch (error) {
+      console.error(error);
+      throw "Erro ao buscar a pasta.";
     }
+  }
 
-    static async put(req: Request, res: Response){
+  static async put(userId, dashboardId, folderId, updatedFolderData) {
+    try {
+      const user = await User.findById(userId);
 
-        try {
-            const userId = req.params.userId
-            const dashboardId = req.params.dashboardId
-            const folderId = req.params.id;
-            const updatedFolderData = req.body;
+      if (!user) {
+        throw "usuário não encontrado";
+      }
 
-            const user = await User.findById(userId)
-          
-            if(!user){
-              res.status(500).json('usuário não encontrado')
-            }
-  
-            const dashboard = user.dashboards.find((d) => d._id.toString() === dashboardId);
-  
-            if (!dashboard) {
-              return res.status(404).json({ error: 'Dashboard não encontrada' });
-            }
+      const dashboard = user.dashboards.find(
+        (d) => d._id.toString() === dashboardId
+      );
 
-            const folderIndex = dashboard.folder.find((f) => f._id.toString() === folderId);
+      if (!dashboard) {
+        throw "Dashboard não encontrada";
+      }
 
+      const folderIndex =  dashboard.folder.find((f) => f._id.toString() === folderId);
+      
 
-            if (!folderIndex) {
-              return res.status(404).json({ message: 'pasta não encontrada.' });
-            }
-            folderIndex.updateOne({folderId: folderIndex.id}, {updatedFolderData})
+      if (!folderIndex) {
+        throw "pasta não encontrada.";
+      }
 
-            res.json(updatedFolderData);
-          } catch (error) {
-            console.error(error);
-            res.status(500).json({ message: 'Erro ao atualizar a pasta.' });
-          }
+      Object.assign(folderIndex, updatedFolderData);
 
+      await user.save();
+
+      return folderIndex;
+    } catch (error) {
+      console.error(error);
+      throw "Erro ao atualizar a pasta.";
     }
-    static async delete(req: Request, res: Response){
-        try {
-          const userId = req.params.userId
-          const dashboardId = req.params.dashboardId
-          const folderId = req.params.id;
+  }
+  static async delete(userId, dashboardId, folderId) {
+    try {
+      const user = await User.findById(userId);
 
-          const user = await User.findById(userId)
-        
-          if(!user){
-            res.status(500).json('usuário não encontrado')
-          }
+      if (!user) {
+        throw "usuário não encontrado";
+      }
 
-          const dashboard = user.dashboards.find((d) => d._id.toString() === dashboardId);
+      const dashboard = user.dashboards.find(
+        (d) => d._id.toString() === dashboardId
+      );
 
-          if (!dashboard) {
-            return res.status(404).json({ error: 'Dashboard não encontrada' });
-          }
+      if (!dashboard) {
+        throw "Dashboard não encontrada";
+      }
 
-          const folderIndex = dashboard.folder.find((f) => f._id.toString() === folderId);
+      const folderIndex = dashboard.folder.find(
+        (f) => f._id.toString() === folderId
+      );
 
+      if (!folderIndex) {
+        throw "pasta não encontrada.";
+      }
 
-          if (!folderIndex) {
-            return res.status(404).json({ message: 'pasta não encontrada.' });
-          }
-          folderIndex.deleteOne({folderId: folderIndex.id})
+      folderIndex.deleteOne({ folderId: folderIndex.id });
 
-          res.json("documento removido");
-          } catch (error) {
-            console.error(error);
-            res.status(500).json({ message: 'Erro ao excluir a pasta.' });
-          }
+      await user.save()
+
+      return folderIndex;
+    } catch (error) {
+      console.error(error);
+      throw "Erro ao excluir a pasta.";
     }
+  }
 }
 
-export default FolderController
+export default FolderController;
