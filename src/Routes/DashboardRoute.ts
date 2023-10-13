@@ -1,20 +1,68 @@
-import DashboardController from '../Controller/DashboardController';
+import express, { response } from "express";
+import DashboardController from "../Controller/DashboardController";
+import { IDashboard } from "../Model/Dashboard";
+import { Request, Response } from "express";
 
-
-import express from 'express'
 const router = express.Router();
 
+router.post("/:userId", async (req: Request, res: Response) => {
+  try {
+    const userId = req.params.userId;
+    const clone: IDashboard = { ...req.body };
+    const dashboardSaved = await DashboardController.post(userId, clone);
+    res.status(200).json(dashboardSaved);
+  } catch (error) {
+    res.status(400).json({ msg: "erro ao salvar a dashboard" });
+  }
+});
 
-  router.post('/:userId', DashboardController.post)
+router.get("/:userId", async (req: Request, res: Response) => {
+  try {
+    const userId = req.params.userId;
+    const dashboards = await DashboardController.getAll(userId);
+    res.status(200).json(dashboards);
+  } catch (error) {
+    res.json({ msg: "erro ao encontrar as dashboards" });
+  }
+});
 
-  router.get('/:userId', DashboardController.getAll);
+router.get("/:userId/:dashboardId", async (req: Request, res: Response) => {
+  try {
+    const dashboardId = req.params.dashboardId;
+    const userId = req.params.userId;
+    const dashboard = await DashboardController.getById(dashboardId, userId);
+    res.status(200).json(dashboard);
+  } catch (error) {
+    res.status(400).json({ msg: error });
+  }
+});
 
-  router.get('/:userId', DashboardController.getById);
+router.put("/:userId/:dashboardId", async (req: Request, res: Response) => {
+  try {
+    const dashboardId = req.params.dashboardId;
+    const userId = req.params.userId;
+    const updatedDashboardData = req.body;
+    const d = await DashboardController.put(
+      dashboardId,
+      userId,
+      updatedDashboardData
+    );
+    res.status(200).json(d);
+  } catch (error) {
+    res.status(400).json({ msg: "erro ao atualizar" });
+  }
+});
 
-  router.put('/:id', DashboardController.put);
+router.delete("/:userId/:dashboardId", async (req: Request, res: Response) => {
+  try {
+    const dashboardId = req.params.dashboardId;
+    const userId = req.params.userId;
+    const a = await DashboardController.delete(userId, dashboardId);
 
-  router.put('/dashboards/:dashboardId/links/:linkId', DashboardController.putLink);
+    res.status(200).json(a);
+  } catch (error) {
+    res.status(400).json({ msg: "erro ao deletar o usuário" });
+  }
+});
 
-  router.delete('/:id', DashboardController.delete);
-
-export default router
+export default router;
