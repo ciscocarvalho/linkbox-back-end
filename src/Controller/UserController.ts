@@ -19,32 +19,28 @@ class UserController {
   static async getAll() {
     try {
       const users = await User.find();
-      console.log(users)
       return users
     } catch (error) {
       throw new Error(error)  
     }
   }
 
-  static async getById(req: Request, res: Response) {
+  static async getById(userId) {
     try {
-      const userId = req.params.id;
 
       const user = await User.findById(userId, "-password");
       if (!user) {
-        return res.status(404).json({ message: "Usuário não encontrado." });
+       throw  "Usuário não encontrado."
       }
 
-      res.json(user);
+      return user
     } catch (error) {
-      console.error(error);
-      res.status(500).json({ message: "Erro ao buscar o usuário." });
+     throw "Erro ao buscar o usuário."
     }
   }
-  static async put(req: Request, res: Response) {
+  static async put(userId, updatedUserData) {
     try {
-      const userId = req.params.id;
-      const updatedUserData = req.body;
+      
       const updatedUser = await User.findByIdAndUpdate(
         userId,
         updatedUserData,
@@ -53,25 +49,25 @@ class UserController {
         }
       );
       if (!updatedUser) {
-        return res.status(404).json({ message: "Usuário não encontrado." });
+        throw "Usuário não encontrado."
       }
-      res.json(updatedUser);
+      return updatedUser
     } catch (error) {
-      console.error(error);
-      res.status(500).json({ message: "Erro ao atualizar o usuário." });
+     
+      throw "Erro ao atualizar o usuário."
     }
   }
-  static async delete(req: Request, res: Response) {
+  static async delete(userId) {
     try {
-      const userId = req.params.id;
       const deletedUser = await User.findByIdAndRemove(userId);
+
       if (!deletedUser) {
-        return res.status(404).json({ message: "Usuário não encontrado." });
+       throw "Usuário não encontrado."
       }
-      res.json(deletedUser);
+     return deletedUser
     } catch (error) {
-      console.error(error);
-      res.status(500).json({ message: "Erro ao excluir o usuário." });
+      
+     throw "Erro ao excluir o usuário."
     }
   }
 }

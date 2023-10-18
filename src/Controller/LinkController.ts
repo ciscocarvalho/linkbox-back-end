@@ -13,7 +13,7 @@ class LinkController {
         throw "Usuário não encontrado"
       }
       const dashboard = user.dashboards.find(
-        (d) => d._id.toString() === dashboardId
+        (d) => d.title.toString() === dashboardId
       );
     
       if (!dashboard) {
@@ -40,7 +40,7 @@ class LinkController {
       }
 
       const dashboard = user.dashboards.find(
-        (d) => d._id.toString() === dashboardId
+        (d) => d.title.toString() === dashboardId
       );
 
       if (!dashboard) {
@@ -68,7 +68,7 @@ class LinkController {
       }
     
       const dashboard = user.dashboards.find(
-        (d) => d._id.toString() === dashboardId
+        (d) => d.title.toString() === dashboardId
       );
     
       if (!dashboard) {
@@ -78,7 +78,7 @@ class LinkController {
       
      
       const link = dashboard.link.find(
-        (l) => l._id.toString() === linkId
+        (l) => l.name.toString() === linkId
       );
     
       if (!link) {
@@ -107,7 +107,7 @@ class LinkController {
       }
 
       const dashboard = user.dashboards.find(
-        (d) => d._id.toString() === dashboardId
+        (d) => d.title.toString() === dashboardId
       );
 
       if (!dashboard) {
@@ -115,7 +115,7 @@ class LinkController {
       }
 
       const linkIndex = dashboard.folder.find(
-        (f) => f._id.toString() === linkId
+        (f) => f.name.toString() === linkId
       );
 
       if (!linkIndex) {

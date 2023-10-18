@@ -10,7 +10,7 @@ class FolderController {
         throw "erro ao encontrar o usuário";
       }
       const dashboard = user.dashboards.find(
-        (d) => d._id.toString() === dashboardId
+        (d) => d.title.toString() === dashboardId
       );
 
       if (!dashboard) {
@@ -35,7 +35,7 @@ class FolderController {
       }
 
       const dashboard = user.dashboards.find(
-        (d) => d._id.toString() === dashboardId
+        (d) => d.title.toString() === dashboardId
       );
 
       if (!dashboard) {
@@ -59,14 +59,14 @@ class FolderController {
       }
 
       const dashboard = user.dashboards.find(
-        (d) => d._id.toString() === dashboardId
+        (d) => d.title.toString() === dashboardId
       );
 
       if (!dashboard) {
         throw "Dashboard não encontrada";
       }
 
-      const folderIndex =  dashboard.folder.find((f) => f._id.toString() === folderId);
+      const folderIndex =  dashboard.folder.find((f) => f.name.toString() === folderId);
       
 
       if (!folderIndex) {
@@ -92,7 +92,7 @@ class FolderController {
       }
 
       const dashboard = user.dashboards.find(
-        (d) => d._id.toString() === dashboardId
+        (d) => d.title.toString() === dashboardId
       );
 
       if (!dashboard) {
@@ -100,7 +100,7 @@ class FolderController {
       }
 
       const folderIndex = dashboard.folder.find(
-        (f) => f._id.toString() === folderId
+        (f) => f.name.toString() === folderId
       );
 
       if (!folderIndex) {

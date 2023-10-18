@@ -16,9 +16,8 @@ class AuthController {
     return token;
   }
 
-  async signup(userT): Promise<any> {
+  async signup(userT){
     
-
     try {
       const newUser = new User(userT);
       await newUser.save();
@@ -29,7 +28,7 @@ class AuthController {
   }
 
 
-  async signin(email, password): Promise<any> {
+  async signin(email, password){
     const user = await User.findOne({ email: email });
 
     if (!user) {

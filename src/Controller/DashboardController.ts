@@ -46,7 +46,7 @@ class DashboardController {
       }
 
       const dashboard = user.dashboards.find(
-        (d) => d._id.toString() === dashboardId
+        (d) => d.title.toString() === dashboardId
       );
        
 
@@ -69,7 +69,7 @@ class DashboardController {
       }
 
       const dashboard = user.dashboards.find(
-        (d) => d._id.toString() === dashboardId
+        (d) => d.title.toString() === dashboardId
       );
 
       Object.assign(dashboard, updatedDashboardData);
