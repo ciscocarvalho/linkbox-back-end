@@ -7,14 +7,12 @@ import User from "../Model/User";
 const router = express.Router();
 
 import AuthController from "../Controller/AuthController";
-
-const authService = new AuthController(User);
+import { checkToken } from "../util/validation";
 
 router.post("/signup", async (req: Request, res: Response) => {
   try {
     const clone = { ...req.body };
-    const userSaved = await authService.signup(clone);
-
+    const userSaved = await AuthController.signup(clone);
     res.status(201).json(userSaved.email);
   } catch (err) {
     res.status(400).send(err.message);
@@ -24,7 +22,7 @@ router.post("/signup", async (req: Request, res: Response) => {
 router.post("/signin", async (req: Request, res: Response) => {
   try {
     const clone = { ...req.body };
-    const { token, userData } = await authService.signin(
+    const { token, userData } = await AuthController.signin(
       clone.email,
       clone.password
     );
@@ -34,7 +32,7 @@ router.post("/signin", async (req: Request, res: Response) => {
       sameSite: "strict",
       secure: false,
     });
-    res.json({ auth: true, user: userData, token: token /** token: token */ });
+    res.json({ auth: true, user: userData, token: token });
   } catch (err) {
     res.status(401).send({ auth: false, token: null, message: err.message });
   }

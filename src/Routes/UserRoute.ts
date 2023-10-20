@@ -15,13 +15,13 @@ router.get('/', async (req, res) =>{
     }
 });
 
-router.get('/:id',checkToken, async (req, res) =>{
+router.get('/:id', async (req, res) =>{
     try {
         const userId = req.params.id;
         const u = await UserController.getById(userId)
         res.status(200).json(u)
     } catch (error) {
-        res.status(400).json(error)
+        res.status(404).json(error)
     }
 });
 

@@ -6,7 +6,7 @@ describe("Should test UserController functions", () => {
     jest.clearAllMocks();
   });
 
-  it("Shoul fetch users sucefully", async () => {
+  it("Should return users sucefully", async () => {
     const userSimulated = [
       { email: "user@1teste", password: "12345678", dashboards: [] },
       { email: "user@2teste", password: "87654321", dashboards: [] },

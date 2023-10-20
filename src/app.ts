@@ -1,5 +1,5 @@
 import express from 'express';
-import connectToMongoDB from './database';
+
 import routes from './Routes/index';
 import cookieParser from 'cookie-parser';
 
@@ -10,18 +10,8 @@ app.use(cookieParser());
 
 app.use('/', routes)
 
-async function startServer() {
-  try {
-    await connectToMongoDB();
+app.get('/', (req, res) => {
+  res.status(200).send('<h1 style="text-align: center">Online!</h1>')
+})
 
-  } catch (error) {
-    console.error('Erro durante a inicialização da aplicação:', error);
-  }
-}
-
-startServer()
-
-
-app.listen(3000, () => {
-  console.log(`Servidor rodando na porta 3000.....`);
-});
+export default app

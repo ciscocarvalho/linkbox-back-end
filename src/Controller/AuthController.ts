@@ -2,6 +2,8 @@ import User, { IUser } from "../Model/User";
 import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
 
+const SALT = 3
+
 class AuthController {
   static user: IUser;
 
@@ -16,9 +18,10 @@ class AuthController {
     return token;
   }
 
-  async signup(userT){
+  static async signup(userT){
     
     try {
+      userT.password = bcrypt.hashSync(userT.password, SALT)
       const newUser = new User(userT);
       await newUser.save();
       return newUser;
@@ -28,11 +31,16 @@ class AuthController {
   }
 
 
-  async signin(email, password){
+  static async signin(email, password){
     const user = await User.findOne({ email: email });
 
     if (!user) {
       throw "error usuário não encontrado";
+    }
+
+    const passwordIsValid = bcrypt.compareSync(password, user.password)
+    if (!passwordIsValid) {
+      throw new Error('Invalid Email or Password!')
     }
     const token = AuthController.genToken(user);
 
