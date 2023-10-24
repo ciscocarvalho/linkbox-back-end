@@ -7,7 +7,7 @@ import User from "../Model/User";
 const router = express.Router();
 
 import AuthController from "../Controller/AuthController";
-import { checkToken } from "../util/validation";
+import Validation from "../util/validation";
 
 router.post("/signup", async (req: Request, res: Response) => {
   try {

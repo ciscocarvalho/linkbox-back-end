@@ -19,9 +19,4 @@ describe("Should test UserController functions", () => {
     expect(resultado).toEqual(userSimulated);
   });
 
-  it("should return one user by id", async () => {
-    const mockRequest = () => ({
-      params: { id: "1" },
-    });
-  });
 });

@@ -2,10 +2,11 @@ import express, { response } from "express";
 import DashboardController from "../Controller/DashboardController";
 import { IDashboard } from "../Model/Dashboard";
 import { Request, Response } from "express";
+import Validations from "../util/validation";
 
 const router = express.Router();
 
-router.post("/:userId", async (req: Request, res: Response) => {
+router.post("/:userId",Validations.checkToken, async (req: Request, res: Response) => {
   try {
     const userId = req.params.userId;
     const clone: IDashboard = { ...req.body };

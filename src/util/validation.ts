@@ -2,7 +2,9 @@ import { Request, Response, NextFunction } from "express"
 import jwt from 'jsonwebtoken'
 import env from 'dotenv'
 
-export function checkToken(req: Request, res: Response, Next: NextFunction){
+class Validations {
+
+  static checkToken(req: Request, res: Response, Next: NextFunction){
 
     const token = req.cookies.token;
   if (!token) {
@@ -13,8 +15,12 @@ export function checkToken(req: Request, res: Response, Next: NextFunction){
     if (err) {
       return res.status(401).send('Token inválido.');
       
+    }else {
+      Next();
     }
-    Next();
     })
 
 }
+}
+
+export default Validations

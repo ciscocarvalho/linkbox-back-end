@@ -2,7 +2,7 @@
 import express from 'express'
 
 import UserController from '../Controller/UserController';
-import { checkToken } from '../util/validation';
+import Validation from '../util/validation';
 
 const router = express.Router();
 
