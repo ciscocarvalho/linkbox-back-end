@@ -6,6 +6,7 @@ export interface IFolder extends Document {
   descricao: String;
   color: String;
   link: [ILink];
+  folder:[IFolder];
 }
 
 export const FolderSchema = new Schema({
@@ -21,8 +22,12 @@ export const FolderSchema = new Schema({
         type: String,
         required: false
     },
-    link: [linkSchema]
+    links: [linkSchema]
 });
+
+FolderSchema.add({
+    folder: [FolderSchema]
+})
 
 const Folder = mongoose.model<IFolder>('Folder', FolderSchema);
 

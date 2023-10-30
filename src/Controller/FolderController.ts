@@ -1,11 +1,13 @@
 
+import { IFolder } from "../Model/Folder";
 import User from "../Model/User";
+import percorrerPath from "../util/util";
 
 class FolderController {
-  static async post(userId, dashboardId, clone) {
+  static async post(userId, dashboardId, clone, path='') {
     try {
       const user = await User.findById(userId);
-
+      console.log('0')
       if (!user) {
         throw "erro ao encontrar o usuário";
       }
@@ -16,11 +18,18 @@ class FolderController {
       if (!dashboard) {
         throw "erro ao encontrar a dashboard";
       }
-
-      dashboard.folder.push(clone);
-      await user.save();
-
-      return dashboard;
+      if(!path){
+        dashboard.folder.push(clone);
+        await user.save();
+        return dashboard;
+      }else{
+        const f = dashboard.folder
+        const pathArray = path.split('/')
+        const destinationfolder = await percorrerPath(pathArray, f);
+        destinationfolder.push(clone)
+          await user.save();
+        return dashboard;
+      }
     } catch (error) {
       console.error(error);
       throw error;
@@ -50,7 +59,7 @@ class FolderController {
     }
   }
 
-  static async put(userId, dashboardId, folderId, updatedFolderData) {
+  static async put(userId, dashboardId, path, updatedFolderData) {
     try {
       const user = await User.findById(userId);
 
@@ -66,24 +75,23 @@ class FolderController {
         throw "Dashboard não encontrada";
       }
 
-      const folderIndex =  dashboard.folder.find((f) => f.name.toString() === folderId);
+      if(!path){
+            throw "pasta não encontrada.";
+        }else{
+            const f = dashboard.folder
+            const pathArray = path.split('/')
+            const destinationfolder = await percorrerPath(pathArray, f);
+            Object.assign(destinationfolder, updatedFolderData);
+              await user.save();
+            return dashboard;
+          }
       
-
-      if (!folderIndex) {
-        throw "pasta não encontrada.";
-      }
-
-      Object.assign(folderIndex, updatedFolderData);
-
-      await user.save();
-
-      return folderIndex;
     } catch (error) {
       console.error(error);
       throw "Erro ao atualizar a pasta.";
     }
   }
-  static async delete(userId, dashboardId, folderId) {
+  static async delete(userId, dashboardId, path) {
     try {
       const user = await User.findById(userId);
 
@@ -99,19 +107,19 @@ class FolderController {
         throw "Dashboard não encontrada";
       }
 
-      const folderIndex = dashboard.folder.find(
-        (f) => f.name.toString() === folderId
-      );
-
-      if (!folderIndex) {
+      if(!path){
         throw "pasta não encontrada.";
+    }else{
+        const f = dashboard.folder
+        const pathArray = path.split('/')
+        const toDeleteFolder = await percorrerPath(pathArray, f);
+        console.log(toDeleteFolder)
+        toDeleteFolder.remove()
+        console.log('------------------')
+        
+          await user.save();
+        return dashboard;
       }
-
-      folderIndex.deleteOne({ folderId: folderIndex.id });
-
-      await user.save()
-
-      return folderIndex;
     } catch (error) {
       console.error(error);
       throw "Erro ao excluir a pasta.";

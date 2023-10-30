@@ -15,7 +15,7 @@ async function startDB() {
 
 
   export function startServer(){
-    app.listen(3000, () => {
+    app.listen(3001, () => {
         console.log(`Servidor rodando na porta 3000.....`);
       });
   }
