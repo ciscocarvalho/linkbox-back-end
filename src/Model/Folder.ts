@@ -22,7 +22,7 @@ export const FolderSchema = new Schema({
         type: String,
         required: false
     },
-    links: [linkSchema]
+    link: [linkSchema]
 });
 
 FolderSchema.add({

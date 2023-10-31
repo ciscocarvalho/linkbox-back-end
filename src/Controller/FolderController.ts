@@ -1,9 +1,9 @@
 
 import { IFolder } from "../Model/Folder";
 import User from "../Model/User";
-import percorrerPath from "../util/util";
+import {percorrerPath} from "../util/util";
 
-class FolderController {
+class FolderController { /*Tudo feito*/
   static async post(userId, dashboardId, clone, path='') {
     try {
       const user = await User.findById(userId);
@@ -19,10 +19,12 @@ class FolderController {
         throw "erro ao encontrar a dashboard";
       }
       if(!path){
+        console.log('2')
         dashboard.folder.push(clone);
         await user.save();
         return dashboard;
       }else{
+        console.log('1')
         const f = dashboard.folder
         const pathArray = path.split('/')
         const destinationfolder = await percorrerPath(pathArray, f);
