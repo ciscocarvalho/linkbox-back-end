@@ -2,9 +2,7 @@
   "compilerOptions": {
     "lib": ["es5", "es6", "dom"],
     "types": ["node", "jest"],
-    "allowImportingTsExtensions": true,
     "outDir": "build",
-    "noEmit": true,
     "target": "es5",
     "module": "commonjs",
     "moduleResolution": "node",

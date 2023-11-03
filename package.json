@@ -7,7 +7,7 @@
     "test": "jest",
     "dev": "npx nodemon",
     "build": "tsc",
-    "start": "npm run build && node build/index.js",
+    "start": "npm run build && node build/server.js",
     "format": "prettier -w ."
   },
   "keywords": [],
