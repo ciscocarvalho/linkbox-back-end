@@ -5,8 +5,8 @@ export interface IFolder extends Document {
   name: String;
   descricao: String;
   color: String;
-  link: [ILink];
-  folder: [IFolder];
+  link: ILink[];
+  folder: IFolder[];
 }
 
 export const FolderSchema = new Schema({

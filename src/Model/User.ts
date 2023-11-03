@@ -4,7 +4,7 @@ import { IDashboard, dashboardSchema } from "./Dashboard";
 export interface IUser extends Document {
   email: String;
   password: String;
-  dashboards: [IDashboard];
+  dashboards: IDashboard[];
 }
 
 const userSchema = new Schema<IUser>({

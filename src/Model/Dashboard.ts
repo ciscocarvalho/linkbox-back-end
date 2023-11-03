@@ -5,7 +5,7 @@ import { IFolder, FolderSchema } from "./Folder";
 export interface IDashboard extends Document {
   title: String;
   link: [ILink];
-  folder: [IFolder];
+  folder: IFolder[];
 }
 
 export const dashboardSchema = new Schema<IDashboard>({
