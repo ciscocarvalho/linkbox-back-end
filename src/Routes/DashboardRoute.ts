@@ -55,7 +55,6 @@ router.delete("/:userId/:dashboardId", async (req: Request, res: Response) => {
     const dashboardId = req.params.dashboardId;
     const userId = req.params.userId;
     const a = await DashboardController.delete(userId, dashboardId);
-
     res.status(200).json(a);
   } catch (error) {
     res.status(400).json({ msg: "erro ao deletar o usuário" });

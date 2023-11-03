@@ -7,14 +7,17 @@ class FolderController {
     try {
       const user = await User.findById(userId);
       console.log("0");
+
       if (!user) {
         throw "erro ao encontrar o usuário";
       }
+
       const dashboard = user.dashboards.find((d) => d.title.toString() === dashboardId);
 
       if (!dashboard) {
         throw "erro ao encontrar a dashboard";
       }
+
       if (!path) {
         console.log("2");
         dashboard.folder.push(clone);
@@ -47,6 +50,7 @@ class FolderController {
       if (!dashboard) {
         throw "Dashboard não encontrada";
       }
+
       const folders = dashboard.folder;
 
       return folders;

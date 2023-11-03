@@ -22,6 +22,7 @@ export const dashboardSchema = new Schema<IDashboard>({
     required: false,
   },
 });
+
 const Dashboard = model("Dashboard", dashboardSchema);
 
 export default Dashboard;

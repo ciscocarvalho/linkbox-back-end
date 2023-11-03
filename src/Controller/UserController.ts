@@ -28,6 +28,7 @@ class UserController {
   static async getById(userId) {
     try {
       const user = await User.findById(userId, "-password");
+
       if (!user) {
         throw "Usuário não encontrado.";
       }
@@ -42,9 +43,11 @@ class UserController {
       const updatedUser = await User.findByIdAndUpdate(userId, updatedUserData, {
         new: true,
       });
+
       if (!updatedUser) {
         throw "Usuário não encontrado.";
       }
+
       return updatedUser;
     } catch (error) {
       throw "Erro ao atualizar o usuário.";
@@ -57,6 +60,7 @@ class UserController {
       if (!deletedUser) {
         throw "Usuário não encontrado.";
       }
+
       return deletedUser;
     } catch (error) {
       throw "Erro ao excluir o usuário.";

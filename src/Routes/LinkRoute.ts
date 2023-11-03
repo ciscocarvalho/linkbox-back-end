@@ -1,5 +1,4 @@
 import { Request, Response, Router } from "express";
-
 import LinkController from "../Controller/LinkController";
 import { ILink } from "../Model/Link";
 

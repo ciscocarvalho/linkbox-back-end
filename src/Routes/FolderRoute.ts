@@ -1,5 +1,4 @@
 import { Request, Response, Router } from "express";
-
 import FolderController from "../Controller/FolderController";
 import { IFolder } from "../Model/Folder";
 

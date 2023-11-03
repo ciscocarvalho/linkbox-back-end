@@ -15,5 +15,6 @@ export function startServer() {
     console.log(`Servidor rodando na porta 3000.....`);
   });
 }
+
 startDB();
 startServer();

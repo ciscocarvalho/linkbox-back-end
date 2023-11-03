@@ -5,8 +5,8 @@ import swaggerUi from "swagger-ui-express";
 import YAML from "yamljs";
 
 const swaggerDocument = YAML.load("./openapi.yml");
-
 const app = express();
+
 app.use(express.json());
 app.use(cookieParser());
 

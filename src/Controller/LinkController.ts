@@ -46,6 +46,7 @@ class LinkController {
       if (!dashboard) {
         throw "Dashboard não encontrada";
       }
+
       const links = dashboard.link;
 
       return links;
