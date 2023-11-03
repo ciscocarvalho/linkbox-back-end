@@ -1,10 +1,8 @@
-import express from "express";
-
-import { Request, Response } from "express";
-
-const router = express.Router();
+import { Request, Response, Router } from "express";
 
 import AuthController from "../Controller/AuthController";
+
+const router = Router();
 
 router.post("/signup", async (req: Request, res: Response) => {
   try {

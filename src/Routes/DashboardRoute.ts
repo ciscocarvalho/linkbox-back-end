@@ -1,10 +1,9 @@
-import express from "express";
 import DashboardController from "../Controller/DashboardController";
 import { IDashboard } from "../Model/Dashboard";
-import { Request, Response } from "express";
+import { Request, Response, Router } from "express";
 import Validations from "../util/validation";
 
-const router = express.Router();
+const router = Router();
 
 router.post("/:userId", Validations.checkToken, async (req: Request, res: Response) => {
   try {

@@ -1,10 +1,9 @@
-import express from "express";
-import { Request, Response } from "express";
+import { Request, Response, Router } from "express";
 
 import FolderController from "../Controller/FolderController";
 import { IFolder } from "../Model/Folder";
 
-const router = express.Router();
+const router = Router();
 
 router.post("/:userId/:dashboardId", async (req: Request, res: Response) => {
   try {

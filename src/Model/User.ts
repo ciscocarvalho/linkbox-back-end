@@ -1,5 +1,5 @@
 // UserModel.ts
-import mongoose, { Schema, Document } from "mongoose";
+import { Schema, Document, model } from "mongoose";
 import { IDashboard, dashboardSchema } from "./Dashboard";
 
 export interface IUser extends Document {
@@ -24,6 +24,6 @@ const userSchema = new Schema<IUser>({
   },
 });
 
-const User = mongoose.model<IUser>("User", userSchema);
+const User = model<IUser>("User", userSchema);
 
 export default User;

@@ -1,4 +1,4 @@
-import mongoose, { Schema, Document } from "mongoose";
+import { Schema, Document, model } from "mongoose";
 import { ILink, linkSchema } from "./Link";
 
 export interface IFolder extends Document {
@@ -29,6 +29,6 @@ FolderSchema.add({
   folder: [FolderSchema],
 });
 
-const Folder = mongoose.model<IFolder>("Folder", FolderSchema);
+const Folder = model<IFolder>("Folder", FolderSchema);
 
 export default Folder;

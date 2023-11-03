@@ -1,10 +1,9 @@
-import express from "express";
-import { Request, Response } from "express";
+import { Request, Response, Router } from "express";
 
 import LinkController from "../Controller/LinkController";
 import { ILink } from "../Model/Link";
 
-const router = express.Router();
+const router = Router();
 
 router.post("/:userId/:dashboardId/*", async (req: Request, res: Response) => {
   try {

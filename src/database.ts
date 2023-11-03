@@ -1,4 +1,4 @@
-import mongoose, { Connection } from "mongoose";
+import { Connection, connect } from "mongoose";
 
 //const mongoURL = `mongodb+srv://${DATABASE_USER}:${DATABASE_PASSWORD}@cluster0.03spr09.mongodb.net/?retryWrites=true&w=majority&appName=AtlasAppre`;
 
@@ -11,7 +11,7 @@ const mongoOptions = {
 
 async function connectToMongoDB(): Promise<Connection> {
   try {
-    const connection = await mongoose.connect(mongoURL, mongoOptions as any);
+    const connection = await connect(mongoURL, mongoOptions as any);
 
     console.log("Conexão com o MongoDB estabelecida com sucesso.");
 

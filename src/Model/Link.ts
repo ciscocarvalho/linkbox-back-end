@@ -1,4 +1,4 @@
-import mongoose, { Schema, Document } from "mongoose";
+import { Schema, Document, model } from "mongoose";
 
 export interface ILink extends Document {
   name: String;
@@ -26,6 +26,6 @@ export const linkSchema = new Schema({
   },
 });
 
-const Link = mongoose.model<ILink>("Link", linkSchema);
+const Link = model<ILink>("Link", linkSchema);
 
 export default Link;

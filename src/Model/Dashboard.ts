@@ -1,4 +1,4 @@
-import mongoose, { Schema, Document } from "mongoose";
+import { Schema, Document, model } from "mongoose";
 import { ILink, linkSchema } from "./Link";
 import { IFolder, FolderSchema } from "./Folder";
 
@@ -22,6 +22,6 @@ export const dashboardSchema = new Schema<IDashboard>({
     required: false,
   },
 });
-const Dashboard = mongoose.model("Dashboard", dashboardSchema);
+const Dashboard = model("Dashboard", dashboardSchema);
 
 export default Dashboard;
