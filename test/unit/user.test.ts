@@ -18,5 +18,4 @@ describe("Should test UserController functions", () => {
 
     expect(resultado).toEqual(userSimulated);
   });
-
 });

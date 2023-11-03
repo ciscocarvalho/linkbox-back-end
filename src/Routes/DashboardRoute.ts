@@ -6,12 +6,12 @@ import Validations from "../util/validation";
 
 const router = express.Router();
 
-router.post("/:userId",Validations.checkToken, async (req: Request, res: Response) => {
+router.post("/:userId", Validations.checkToken, async (req: Request, res: Response) => {
   try {
     const userId = req.params.userId;
     const clone: IDashboard = { ...req.body };
     const dashboardSaved = await DashboardController.post(userId, clone);
-    console.log('030')
+    console.log("030");
     res.status(200).json(dashboardSaved);
   } catch (error) {
     res.status(400).json({ msg: "erro ao salvar a dashboard" });
@@ -44,11 +44,7 @@ router.put("/:userId/:dashboardId", async (req: Request, res: Response) => {
     const dashboardId = req.params.dashboardId;
     const userId = req.params.userId;
     const updatedDashboardData = req.body;
-    const d = await DashboardController.put(
-      dashboardId,
-      userId,
-      updatedDashboardData
-    );
+    const d = await DashboardController.put(dashboardId, userId, updatedDashboardData);
     res.status(200).json(d);
   } catch (error) {
     res.status(400).json({ msg: "erro ao atualizar" });

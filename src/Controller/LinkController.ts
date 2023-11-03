@@ -1,20 +1,18 @@
 import { Response, Request } from "express";
 import Link, { ILink } from "../Model/Link";
 import User from "../Model/User";
-import {percorrerPath, percorrerPathLink} from "../util/util";
+import { percorrerPath, percorrerPathLink } from "../util/util";
 import { IFolder } from "../Model/Folder";
 
 class LinkController {
-  static async post(userId, dashboardId, linkData, path)/*atualizado */ {
+  static async post(userId, dashboardId, linkData, path) /*atualizado */ {
     try {
       const user = await User.findById(userId);
 
       if (!user) {
         throw "Usuário não encontrado";
       }
-      const dashboard = user.dashboards.find(
-        (d) => d.title.toString() === dashboardId
-      );
+      const dashboard = user.dashboards.find((d) => d.title.toString() === dashboardId);
 
       if (!dashboard) {
         throw "Dashboard não encontrada";
@@ -29,7 +27,7 @@ class LinkController {
         const pathArray = path.split("/");
         const destinationfolder = await percorrerPathLink(pathArray, f);
         const area = destinationfolder.link;
-        area.push(linkData)
+        area.push(linkData);
         await user.save();
         return dashboard;
       }
@@ -38,7 +36,7 @@ class LinkController {
       throw "Erro ao criar a pasta.";
     }
   }
-  static async getAllInDashboard(userId, dashboardId)/*Não acho que precise atualizar */ {
+  static async getAllInDashboard(userId, dashboardId) /*Não acho que precise atualizar */ {
     try {
       const user = await User.findById(userId);
 
@@ -46,9 +44,7 @@ class LinkController {
         throw "usuário não encontrado";
       }
 
-      const dashboard = user.dashboards.find(
-        (d) => d.title.toString() === dashboardId
-      );
+      const dashboard = user.dashboards.find((d) => d.title.toString() === dashboardId);
 
       if (!dashboard) {
         throw "Dashboard não encontrada";
@@ -62,7 +58,7 @@ class LinkController {
     }
   }
 
-  static async put(userId, dashboardId, path, updatedLinkData)/**Não atualizado */ {
+  static async put(userId, dashboardId, path, updatedLinkData) /**Não atualizado */ {
     try {
       const user = await User.findById(userId);
 
@@ -70,32 +66,28 @@ class LinkController {
         throw "Usuário não encontrado";
       }
 
-      const dashboard = user.dashboards.find(
-        (d) => d.title.toString() === dashboardId
-      );
+      const dashboard = user.dashboards.find((d) => d.title.toString() === dashboardId);
 
       if (!dashboard) {
         throw "Dashboard não encontrada";
       }
 
-      if(!path){
+      if (!path) {
         throw "pasta não encontrada.";
-    }else{
-      console.log('1')
+      } else {
+        console.log("1");
         const f = dashboard.folder;
         const pathArray = path.split("/");
-        const nomeDoLink = pathArray.pop()
+        const nomeDoLink = pathArray.pop();
         const destinationfolder = await percorrerPathLink(pathArray, f);
         const area = destinationfolder.link;
-        const linkToUpadte = area.filter(element => {
+        const linkToUpadte = area.filter((element) => {
           return element.name.toString() === nomeDoLink;
         });
         Object.assign(linkToUpadte, updatedLinkData);
-          await user.save();
+        await user.save();
         return linkToUpadte;
       }
-
-      
     } catch (error) {
       console.error(error);
       throw "Erro ao atualizar a pasta.";
@@ -109,25 +101,23 @@ class LinkController {
         throw "usuário não encontrado";
       }
 
-      const dashboard = user.dashboards.find(
-        (d) => d.title.toString() === dashboardId
-      );
+      const dashboard = user.dashboards.find((d) => d.title.toString() === dashboardId);
 
       if (!dashboard) {
         throw "Dashboard não encontrada";
       }
 
-      if(!path){
+      if (!path) {
         throw "pasta não encontrada.";
-    }else{
-        const f = dashboard.folder
-        const pathArray = path.split('/')
+      } else {
+        const f = dashboard.folder;
+        const pathArray = path.split("/");
         const link = await percorrerPath(pathArray, f);
-        const areaLink = link[0]
-        const linkk = areaLink.link/**ainda tenho que procurar o link certo */
-        console.log(linkk)
-        
-          await user.save();
+        const areaLink = link[0];
+        const linkk = areaLink.link; /**ainda tenho que procurar o link certo */
+        console.log(linkk);
+
+        await user.save();
         return link;
       }
 
@@ -143,7 +133,7 @@ class LinkController {
 
       await user.save();*/
 
-     // return linkIndex;
+      // return linkIndex;
     } catch (error) {
       console.error(error);
       throw "Erro ao excluir a pasta.";

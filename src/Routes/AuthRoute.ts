@@ -22,10 +22,7 @@ router.post("/signup", async (req: Request, res: Response) => {
 router.post("/signin", async (req: Request, res: Response) => {
   try {
     const clone = { ...req.body };
-    const { token, userData } = await AuthController.signin(
-      clone.email,
-      clone.password
-    );
+    const { token, userData } = await AuthController.signin(clone.email, clone.password);
     res.cookie("token", token, {
       maxAge: 3600000,
       httpOnly: true,

@@ -1,35 +1,33 @@
-
 import { IFolder } from "../Model/Folder";
 import User from "../Model/User";
-import {percorrerPath} from "../util/util";
+import { percorrerPath } from "../util/util";
 
-class FolderController { /*Tudo feito*/
-  static async post(userId, dashboardId, clone, path='') {
+class FolderController {
+  /*Tudo feito*/
+  static async post(userId, dashboardId, clone, path = "") {
     try {
       const user = await User.findById(userId);
-      console.log('0')
+      console.log("0");
       if (!user) {
         throw "erro ao encontrar o usuário";
       }
-      const dashboard = user.dashboards.find(
-        (d) => d.title.toString() === dashboardId
-      );
+      const dashboard = user.dashboards.find((d) => d.title.toString() === dashboardId);
 
       if (!dashboard) {
         throw "erro ao encontrar a dashboard";
       }
-      if(!path){
-        console.log('2')
+      if (!path) {
+        console.log("2");
         dashboard.folder.push(clone);
         await user.save();
         return dashboard;
-      }else{
-        console.log('1')
-        const f = dashboard.folder
-        const pathArray = path.split('/')
+      } else {
+        console.log("1");
+        const f = dashboard.folder;
+        const pathArray = path.split("/");
         const destinationfolder = await percorrerPath(pathArray, f);
-        destinationfolder.push(clone)
-          await user.save();
+        destinationfolder.push(clone);
+        await user.save();
         return dashboard;
       }
     } catch (error) {
@@ -45,9 +43,7 @@ class FolderController { /*Tudo feito*/
         throw "usuário não encontrado";
       }
 
-      const dashboard = user.dashboards.find(
-        (d) => d.title.toString() === dashboardId
-      );
+      const dashboard = user.dashboards.find((d) => d.title.toString() === dashboardId);
 
       if (!dashboard) {
         throw "Dashboard não encontrada";
@@ -69,25 +65,22 @@ class FolderController { /*Tudo feito*/
         throw "usuário não encontrado";
       }
 
-      const dashboard = user.dashboards.find(
-        (d) => d.title.toString() === dashboardId
-      );
+      const dashboard = user.dashboards.find((d) => d.title.toString() === dashboardId);
 
       if (!dashboard) {
         throw "Dashboard não encontrada";
       }
 
-      if(!path){
-            throw "pasta não encontrada.";
-        }else{
-            const f = dashboard.folder
-            const pathArray = path.split('/')
-            const destinationfolder = await percorrerPath(pathArray, f);
-            Object.assign(destinationfolder, updatedFolderData);
-              await user.save();
-            return dashboard;
-          }
-      
+      if (!path) {
+        throw "pasta não encontrada.";
+      } else {
+        const f = dashboard.folder;
+        const pathArray = path.split("/");
+        const destinationfolder = await percorrerPath(pathArray, f);
+        Object.assign(destinationfolder, updatedFolderData);
+        await user.save();
+        return dashboard;
+      }
     } catch (error) {
       console.error(error);
       throw "Erro ao atualizar a pasta.";
@@ -101,25 +94,23 @@ class FolderController { /*Tudo feito*/
         throw "usuário não encontrado";
       }
 
-      const dashboard = user.dashboards.find(
-        (d) => d.title.toString() === dashboardId
-      );
+      const dashboard = user.dashboards.find((d) => d.title.toString() === dashboardId);
 
       if (!dashboard) {
         throw "Dashboard não encontrada";
       }
 
-      if(!path){
+      if (!path) {
         throw "pasta não encontrada.";
-    }else{
-        const f = dashboard.folder
-        const pathArray = path.split('/')
+      } else {
+        const f = dashboard.folder;
+        const pathArray = path.split("/");
         const toDeleteFolder = await percorrerPath(pathArray, f);
-        console.log(toDeleteFolder)
-        toDeleteFolder.remove()
-        console.log('------------------')
-        
-          await user.save();
+        console.log(toDeleteFolder);
+        toDeleteFolder.remove();
+        console.log("------------------");
+
+        await user.save();
         return dashboard;
       }
     } catch (error) {

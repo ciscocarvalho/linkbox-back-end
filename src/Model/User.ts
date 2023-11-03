@@ -1,6 +1,6 @@
 // UserModel.ts
-import mongoose, { Schema, Document } from 'mongoose';
-import {IDashboard, dashboardSchema } from './Dashboard';
+import mongoose, { Schema, Document } from "mongoose";
+import { IDashboard, dashboardSchema } from "./Dashboard";
 
 export interface IUser extends Document {
   email: String;
@@ -20,10 +20,10 @@ const userSchema = new Schema<IUser>({
   },
   dashboards: {
     type: [dashboardSchema],
-    required: false
-  }, 
+    required: false,
+  },
 });
 
-const User = mongoose.model<IUser>('User', userSchema);
+const User = mongoose.model<IUser>("User", userSchema);
 
 export default User;

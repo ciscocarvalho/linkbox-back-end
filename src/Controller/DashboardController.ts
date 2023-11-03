@@ -45,10 +45,7 @@ class DashboardController {
         throw "Usuário não encontrado.";
       }
 
-      const dashboard = user.dashboards.find(
-        (d) => d.title.toString() === dashboardId
-      );
-       
+      const dashboard = user.dashboards.find((d) => d.title.toString() === dashboardId);
 
       if (!dashboard) {
         throw "Dashboard não encontrada.";
@@ -68,9 +65,7 @@ class DashboardController {
         throw "Usuário não encontrado.";
       }
 
-      const dashboard = user.dashboards.find(
-        (d) => d.title.toString() === dashboardId
-      );
+      const dashboard = user.dashboards.find((d) => d.title.toString() === dashboardId);
 
       Object.assign(dashboard, updatedDashboardData);
 
@@ -91,15 +86,13 @@ class DashboardController {
         throw "Usuário não encontrado.";
       }
 
-
       const updatedUser = await User.findOneAndUpdate(
         { _id: userId },
         {
-          $pull: { 'dashboards': { _id: dashboardId } }
+          $pull: { dashboards: { _id: dashboardId } },
         },
-        { new: true }
+        { new: true },
       );
-
 
       return updatedUser;
     } catch (error) {

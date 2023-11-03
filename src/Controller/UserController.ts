@@ -19,42 +19,35 @@ class UserController {
   static async getAll() {
     try {
       const users = await User.find();
-      return users
+      return users;
     } catch (error) {
-      throw new Error(error)  
+      throw new Error(error);
     }
   }
 
   static async getById(userId) {
     try {
-
       const user = await User.findById(userId, "-password");
       if (!user) {
-       throw  "Usuário não encontrado."
+        throw "Usuário não encontrado.";
       }
 
-      return user
+      return user;
     } catch (error) {
-     throw "Erro ao buscar o usuário."
+      throw "Erro ao buscar o usuário.";
     }
   }
   static async put(userId, updatedUserData) {
     try {
-      
-      const updatedUser = await User.findByIdAndUpdate(
-        userId,
-        updatedUserData,
-        {
-          new: true,
-        }
-      );
+      const updatedUser = await User.findByIdAndUpdate(userId, updatedUserData, {
+        new: true,
+      });
       if (!updatedUser) {
-        throw "Usuário não encontrado."
+        throw "Usuário não encontrado.";
       }
-      return updatedUser
+      return updatedUser;
     } catch (error) {
-     
-      throw "Erro ao atualizar o usuário."
+      throw "Erro ao atualizar o usuário.";
     }
   }
   static async delete(userId) {
@@ -62,12 +55,11 @@ class UserController {
       const deletedUser = await User.findByIdAndRemove(userId);
 
       if (!deletedUser) {
-       throw "Usuário não encontrado."
+        throw "Usuário não encontrado.";
       }
-     return deletedUser
+      return deletedUser;
     } catch (error) {
-      
-     throw "Erro ao excluir o usuário."
+      throw "Erro ao excluir o usuário.";
     }
   }
 }
