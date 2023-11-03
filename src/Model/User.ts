@@ -1,4 +1,3 @@
-// UserModel.ts
 import { Schema, Document, model } from "mongoose";
 import { IDashboard, dashboardSchema } from "./Dashboard";
 

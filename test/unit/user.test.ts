@@ -1,4 +1,4 @@
-import UserController from "../../src/Controller/UserController"; // Substitua pelo caminho correto
+import UserController from "../../src/Controller/UserController";
 import User from "../../src/Model/User";
 
 describe("Should test UserController functions", () => {

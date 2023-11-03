@@ -2,7 +2,6 @@ import User from "../Model/User";
 import { percorrerPath } from "../util/util";
 
 class FolderController {
-  /*Tudo feito*/
   static async post(userId, dashboardId, clone, path = "") {
     try {
       const user = await User.findById(userId);

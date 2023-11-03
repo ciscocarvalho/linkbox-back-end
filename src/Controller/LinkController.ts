@@ -2,7 +2,7 @@ import User from "../Model/User";
 import { percorrerPath, percorrerPathLink } from "../util/util";
 
 class LinkController {
-  static async post(userId, dashboardId, linkData, path) /*atualizado */ {
+  static async post(userId, dashboardId, linkData, path) {
     try {
       const user = await User.findById(userId);
 
@@ -33,7 +33,7 @@ class LinkController {
       throw "Erro ao criar a pasta.";
     }
   }
-  static async getAllInDashboard(userId, dashboardId) /*Não acho que precise atualizar */ {
+  static async getAllInDashboard(userId, dashboardId) {
     try {
       const user = await User.findById(userId);
 
@@ -56,7 +56,7 @@ class LinkController {
     }
   }
 
-  static async put(userId, dashboardId, path, updatedLinkData) /**Não atualizado */ {
+  static async put(userId, dashboardId, path, updatedLinkData) {
     try {
       const user = await User.findById(userId);
 
@@ -91,7 +91,7 @@ class LinkController {
       throw "Erro ao atualizar a pasta.";
     }
   }
-  static async delete(userId, dashboardId, path) /**Não atualizado */ {
+  static async delete(userId, dashboardId, path) {
     try {
       const user = await User.findById(userId);
 
@@ -112,26 +112,12 @@ class LinkController {
         const pathArray = path.split("/");
         const link = await percorrerPath(pathArray, f);
         const areaLink = link[0];
-        const linkk = areaLink.link; /**ainda tenho que procurar o link certo */
+        const linkk = areaLink.link;
         console.log(linkk);
 
         await user.save();
         return link;
       }
-
-      /*const linkIndex = dashboard.folder.find(
-        (f) => f.name.toString() === linkId
-      );*/
-
-      /*if (!linkIndex) {
-        throw "pasta não encontrada.";
-      }
-
-      linkIndex.deleteOne({ linkId: linkIndex.id });
-
-      await user.save();*/
-
-      // return linkIndex;
     } catch (error) {
       console.error(error);
       throw "Erro ao excluir a pasta.";
