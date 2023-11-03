@@ -1,6 +1,6 @@
 import mongoose, { Schema, Document } from "mongoose";
 import { ILink, linkSchema } from "./Link";
-import Folder, { IFolder, FolderSchema } from "./Folder";
+import { IFolder, FolderSchema } from "./Folder";
 
 export interface IDashboard extends Document {
   title: String;

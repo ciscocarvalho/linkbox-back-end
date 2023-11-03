@@ -1,4 +1,4 @@
-import express, { response } from "express";
+import express from "express";
 import DashboardController from "../Controller/DashboardController";
 import { IDashboard } from "../Model/Dashboard";
 import { Request, Response } from "express";

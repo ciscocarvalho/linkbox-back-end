@@ -1,5 +1,3 @@
-import Dashboard, { IDashboard } from "../Model/Dashboard";
-import { Request, Response } from "express";
 import User from "../Model/User";
 
 class DashboardController {

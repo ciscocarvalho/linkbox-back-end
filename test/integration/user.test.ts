@@ -1,15 +1,13 @@
 import "dotenv/config";
 import app from "../../src/app";
 import supertest from "supertest";
-import { startServer } from "../../server";
 import { MongoMemoryServer } from "mongodb-memory-server";
 import mongoose from "mongoose";
 import AuthController from "../../src/Controller/AuthController";
 import Validations from "../../src/util/validation";
-import { Request, Response, NextFunction } from "express";
+import { Request, Response } from "express";
 import jwt from "jsonwebtoken";
 
-const API_BASE = process.env.API_BASE;
 const chave = process.env.SECRET;
 
 const userId = new mongoose.Types.ObjectId().toString();
@@ -52,7 +50,7 @@ describe("Users", () => {
   describe("test user validation", () => {
     describe("verify the handle with error", () => {
       it("should return a 400", async () => {
-        const createUserMock = jest
+        jest
           .spyOn(AuthController, "signup")
           // @ts-ignore
           .mockRejectedValueOnce("oh no");
@@ -65,7 +63,7 @@ describe("Users", () => {
 
     describe("given the password and email are valid", () => {
       it("should return a payload", async () => {
-        const createUserMock = jest
+        jest
           .spyOn(AuthController, "signup")
           // @ts-ignore
           .mockReturnValueOnce(userPayload);

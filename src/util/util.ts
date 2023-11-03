@@ -1,5 +1,3 @@
-import { IFolder } from "../Model/Folder";
-
 export function percorrerPath(path, folder) {
   if (path.length === 0) {
     return folder;

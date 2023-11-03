@@ -1,9 +1,5 @@
 import mongoose, { Connection } from "mongoose";
 
-const DATABASE_PASSWORD = process.env.DATABASE_PASSWORD;
-const DATABASE_USER = process.env.DATABASE_USER;
-const PORT = process.env.PORT || 3000;
-
 //const mongoURL = `mongodb+srv://${DATABASE_USER}:${DATABASE_PASSWORD}@cluster0.03spr09.mongodb.net/?retryWrites=true&w=majority&appName=AtlasAppre`;
 
 const mongoURL = "mongodb://127.0.0.1:27017/person";

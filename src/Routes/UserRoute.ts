@@ -1,7 +1,6 @@
 import express from "express";
 
 import UserController from "../Controller/UserController";
-import Validation from "../util/validation";
 
 const router = express.Router();
 
@@ -28,7 +27,7 @@ router.put("/:id", async (req, res) => {
   try {
     const userId = req.params.id;
     const updatedUserData = req.body;
-    const u = UserController.put(userId, updatedUserData);
+    UserController.put(userId, updatedUserData);
   } catch (error) {
     res.status(400).json(error);
   }

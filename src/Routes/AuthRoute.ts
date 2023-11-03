@@ -2,12 +2,9 @@ import express from "express";
 
 import { Request, Response } from "express";
 
-import User from "../Model/User";
-
 const router = express.Router();
 
 import AuthController from "../Controller/AuthController";
-import Validation from "../util/validation";
 
 router.post("/signup", async (req: Request, res: Response) => {
   try {

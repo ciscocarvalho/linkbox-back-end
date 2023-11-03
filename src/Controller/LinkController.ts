@@ -1,8 +1,5 @@
-import { Response, Request } from "express";
-import Link, { ILink } from "../Model/Link";
 import User from "../Model/User";
 import { percorrerPath, percorrerPathLink } from "../util/util";
-import { IFolder } from "../Model/Folder";
 
 class LinkController {
   static async post(userId, dashboardId, linkData, path) /*atualizado */ {

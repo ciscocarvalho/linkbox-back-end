@@ -1,4 +1,3 @@
-import { IFolder } from "../Model/Folder";
 import User from "../Model/User";
 import { percorrerPath } from "../util/util";
 
