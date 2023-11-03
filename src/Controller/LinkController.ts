@@ -1,8 +1,9 @@
+import { ILink } from "../Model/Link";
 import User from "../Model/User";
 import { percorrerPath, percorrerPathLink } from "../util/util";
 
 class LinkController {
-  static async post(userId, dashboardId, linkData, path) {
+  static async post(userId: string, dashboardId: string, linkData: ILink, path: string) {
     try {
       const user = await User.findById(userId);
 
@@ -33,7 +34,7 @@ class LinkController {
       throw "Erro ao criar a pasta.";
     }
   }
-  static async getAllInDashboard(userId, dashboardId) {
+  static async getAllInDashboard(userId: string, dashboardId: string) {
     try {
       const user = await User.findById(userId);
 
@@ -56,7 +57,7 @@ class LinkController {
     }
   }
 
-  static async put(userId, dashboardId, path, updatedLinkData) {
+  static async put(userId: string, dashboardId: string, path: string, updatedLinkData: Partial<ILink>) {
     try {
       const user = await User.findById(userId);
 
@@ -78,7 +79,7 @@ class LinkController {
         const pathArray = path.split("/");
         const nomeDoLink = pathArray.pop();
         const destinationfolder = await percorrerPathLink(pathArray, f);
-        const area = destinationfolder.link;
+        const area = destinationfolder.link as [ILink];
         const linkToUpadte = area.filter((element) => {
           return element.name.toString() === nomeDoLink;
         });
@@ -91,7 +92,7 @@ class LinkController {
       throw "Erro ao atualizar a pasta.";
     }
   }
-  static async delete(userId, dashboardId, path) {
+  static async delete(userId: string, dashboardId: string, path: string) {
     try {
       const user = await User.findById(userId);
 

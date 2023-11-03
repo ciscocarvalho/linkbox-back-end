@@ -1,7 +1,8 @@
+import { IDashboard } from "../Model/Dashboard";
 import User from "../Model/User";
 
 class DashboardController {
-  static async post(userId, dashboard) {
+  static async post(userId: string, dashboard: IDashboard) {
     try {
       const user = await User.findById(userId);
 
@@ -18,7 +19,7 @@ class DashboardController {
     }
   }
 
-  static async getAll(userId) {
+  static async getAll(userId: string) {
     try {
       const user = await User.findById(userId);
 
@@ -35,7 +36,7 @@ class DashboardController {
     }
   }
 
-  static async getById(dashboardId, userId) {
+  static async getById(dashboardId: string, userId: string) {
     try {
       const user = await User.findById(userId);
 
@@ -55,7 +56,7 @@ class DashboardController {
       throw "Erro ao buscar a dashboard";
     }
   }
-  static async put(dashboardId, userId, updatedDashboardData) {
+  static async put(dashboardId: string, userId: string, updatedDashboardData: Partial<IDashboard>) {
     try {
       const user = await User.findById(userId);
 
@@ -76,7 +77,7 @@ class DashboardController {
     }
   }
 
-  static async delete(userId, dashboardId) {
+  static async delete(userId: string, dashboardId: string) {
     try {
       const user = await User.findById(userId);
 

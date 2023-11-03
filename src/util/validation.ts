@@ -1,4 +1,4 @@
-import { Request, Response, NextFunction } from "express";
+import { NextFunction, Request, Response } from "express";
 import jwt from "jsonwebtoken";
 
 class Validations {
@@ -9,7 +9,7 @@ class Validations {
       return res.status(403).send("Token não fornecido.");
     }
 
-    jwt.verify(token, process.env.SECRET, (err, decoded) => {
+    jwt.verify(token, process.env.SECRET, (err: jwt.VerifyErrors) => {
       if (err) {
         return res.status(401).send("Token inválido.");
       }

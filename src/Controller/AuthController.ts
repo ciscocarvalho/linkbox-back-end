@@ -7,20 +7,20 @@ const SALT = 3;
 class AuthController {
   static user: IUser;
 
-  constructor(user) {
+  constructor(user: IUser) {
     AuthController.user = user;
   }
 
-  static genToken(user) {
+  static genToken(user: IUser) {
     const token = jwt.sign({ id: user.id }, process.env.SECRET, {
       expiresIn: "1h",
     });
     return token;
   }
 
-  static async signup(userT) {
+  static async signup(userT: IUser) {
     try {
-      userT.password = bcrypt.hashSync(userT.password, SALT);
+      userT.password = bcrypt.hashSync(userT.password.toString(), SALT);
       const newUser = new User(userT);
       await newUser.save();
       return newUser;
@@ -29,7 +29,7 @@ class AuthController {
     }
   }
 
-  static async signin(email, password) {
+  static async signin(email: string, password: string) {
     const user = await User.findOne({ email: email });
 
     if (!user) {

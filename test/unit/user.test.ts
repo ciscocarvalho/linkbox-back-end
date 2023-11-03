@@ -1,5 +1,5 @@
 import UserController from "../../src/Controller/UserController";
-import User from "../../src/Model/User";
+import User, { IUser } from "../../src/Model/User";
 
 describe("Should test UserController functions", () => {
   beforeEach(() => {
@@ -7,7 +7,7 @@ describe("Should test UserController functions", () => {
   });
 
   it("Should return users sucefully", async () => {
-    const userSimulated = [
+    const userSimulated: Partial<IUser>[] = [
       { email: "user@1teste", password: "12345678", dashboards: [] },
       { email: "user@2teste", password: "87654321", dashboards: [] },
     ];

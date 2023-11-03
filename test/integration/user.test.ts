@@ -7,6 +7,7 @@ import AuthController from "../../src/Controller/AuthController";
 import Validations from "../../src/util/validation";
 import { Request, Response } from "express";
 import jwt from "jsonwebtoken";
+import { IUser } from "../../src/Model/User";
 
 const chave = process.env.SECRET;
 
@@ -25,17 +26,17 @@ let called = false;
 const customNext = () => {
   called = true;
 };
-const userPayload = {
+const userPayload: Partial<IUser> = {
   _id: userId,
   email: "jane.doe@example.com",
   password: "4545454",
-  dashboard: [],
+  dashboards: [],
 };
 
-const userInput = {
+const userInput: Partial<IUser> = {
   email: "teste@@1gmail.com",
   password: "90909090",
-  dashbords: [],
+  dashboards: [],
 };
 
 describe("Users", () => {

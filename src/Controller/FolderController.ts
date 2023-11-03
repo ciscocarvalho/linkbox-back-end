@@ -1,8 +1,9 @@
+import { IFolder } from "../Model/Folder";
 import User from "../Model/User";
 import { percorrerPath } from "../util/util";
 
 class FolderController {
-  static async post(userId, dashboardId, clone, path = "") {
+  static async post(userId: string, dashboardId: string, clone: IFolder, path = "") {
     try {
       const user = await User.findById(userId);
       console.log("0");
@@ -36,7 +37,7 @@ class FolderController {
       throw error;
     }
   }
-  static async getAll(userId, dashboardId) {
+  static async getAll(userId: string, dashboardId: string) {
     try {
       const user = await User.findById(userId);
 
@@ -59,7 +60,7 @@ class FolderController {
     }
   }
 
-  static async put(userId, dashboardId, path, updatedFolderData) {
+  static async put(userId: string, dashboardId: string, path: string, updatedFolderData: Partial<IFolder>) {
     try {
       const user = await User.findById(userId);
 
@@ -88,7 +89,7 @@ class FolderController {
       throw "Erro ao atualizar a pasta.";
     }
   }
-  static async delete(userId, dashboardId, path) {
+  static async delete(userId: string, dashboardId: string, path: string) {
     try {
       const user = await User.findById(userId);
 

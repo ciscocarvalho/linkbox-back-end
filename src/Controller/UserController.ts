@@ -25,7 +25,7 @@ class UserController {
     }
   }
 
-  static async getById(userId) {
+  static async getById(userId: string) {
     try {
       const user = await User.findById(userId, "-password");
 
@@ -38,7 +38,7 @@ class UserController {
       throw "Erro ao buscar o usuário.";
     }
   }
-  static async put(userId, updatedUserData) {
+  static async put(userId: string, updatedUserData: IUser) {
     try {
       const updatedUser = await User.findByIdAndUpdate(userId, updatedUserData, {
         new: true,
@@ -53,7 +53,7 @@ class UserController {
       throw "Erro ao atualizar o usuário.";
     }
   }
-  static async delete(userId) {
+  static async delete(userId: string) {
     try {
       const deletedUser = await User.findByIdAndRemove(userId);
 

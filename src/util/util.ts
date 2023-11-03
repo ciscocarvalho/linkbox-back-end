@@ -1,19 +1,19 @@
-export function percorrerPath(path, folder) {
+export function percorrerPath(path: any, folder: any) {
   if (path.length === 0) {
     return folder;
   }
 
-  const folderDTO = folder.find((b) => b.name === path[0]);
+  const folderDTO = folder.find((b: any) => b.name === path[0]);
   path.shift();
   return percorrerPath(path, folderDTO.folder);
 }
 
-export function percorrerPathLink(path, folder) {
+export function percorrerPathLink(path: string[], folder: any) {
   if (path.length === 0) {
-    return folder;
+    return folder[0];
   }
 
-  const folderDTO = folder.find((b) => b.name === path[0]);
+  const folderDTO = folder.find((b: any) => b.name === path[0]);
   path.shift();
-  return percorrerPath(path, folderDTO);
+  return percorrerPath(path, folderDTO.folder);
 }
