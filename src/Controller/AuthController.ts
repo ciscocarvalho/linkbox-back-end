@@ -38,7 +38,7 @@ class AuthController {
       throw "error usuário não encontrado";
     }
 
-    const passwordIsValid = bcrypt.compareSync(password, user.password)
+    const passwordIsValid = bcrypt.compareSync(password, user.password.toString())
     if (!passwordIsValid) {
       throw new Error('Invalid Email or Password!')
     }
