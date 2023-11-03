@@ -1,7 +1,4 @@
 import mongoose, { Connection } from "mongoose";
-import dotenv from "dotenv";
-
-dotenv.config();
 
 const DATABASE_PASSWORD = process.env.DATABASE_PASSWORD;
 const DATABASE_USER = process.env.DATABASE_USER;

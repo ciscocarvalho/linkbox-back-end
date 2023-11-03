@@ -1,5 +1,5 @@
+import "dotenv/config";
 import app from "../../src/app";
-import dotenv from "dotenv";
 import supertest from "supertest";
 import { startServer } from "../../server";
 import { MongoMemoryServer } from "mongodb-memory-server";
@@ -9,7 +9,6 @@ import Validations from "../../src/util/validation";
 import { Request, Response, NextFunction } from "express";
 import jwt from "jsonwebtoken";
 
-dotenv.config();
 const API_BASE = process.env.API_BASE;
 const chave = process.env.SECRET;
 
