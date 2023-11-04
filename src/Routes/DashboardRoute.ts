@@ -12,7 +12,7 @@ router.post("/:userId", Validations.checkToken, async (req: Request, res: Respon
     const dashboardSaved = await DashboardController.post(userId, clone);
     res.status(200).json(dashboardSaved);
   } catch (error) {
-    res.status(400).json({ msg: "erro ao salvar a dashboard" });
+    res.status(400).json({ msg: error.message });
   }
 });
 
@@ -22,7 +22,7 @@ router.get("/:userId", async (req: Request, res: Response) => {
     const dashboards = await DashboardController.getAll(userId);
     res.status(200).json(dashboards);
   } catch (error) {
-    res.json({ msg: "erro ao encontrar as dashboards" });
+    res.json({ msg: error.message });
   }
 });
 
@@ -45,7 +45,7 @@ router.put("/:userId/:dashboardId", async (req: Request, res: Response) => {
     const d = await DashboardController.put(dashboardId, userId, updatedDashboardData);
     res.status(200).json(d);
   } catch (error) {
-    res.status(400).json({ msg: "erro ao atualizar" });
+    res.status(400).json({ msg: error.message });
   }
 });
 
@@ -56,7 +56,7 @@ router.delete("/:userId/:dashboardId", async (req: Request, res: Response) => {
     const a = await DashboardController.delete(userId, dashboardId);
     res.status(200).json(a);
   } catch (error) {
-    res.status(400).json({ msg: "erro ao deletar o usuário" });
+    res.status(400).json({ msg: error.message });
   }
 });
 

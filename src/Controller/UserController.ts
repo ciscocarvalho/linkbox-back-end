@@ -25,7 +25,7 @@ class UserController {
     const user = await User.findById(userId, "-password");
 
     if (!user) {
-      throw new Error("Usuário não encontrado.");
+      throw new Error("User not found");
     }
 
     return user;
@@ -36,7 +36,7 @@ class UserController {
     });
 
     if (!updatedUser) {
-      throw new Error("Usuário não encontrado.");
+      throw new Error("User not found");
     }
 
     return updatedUser;
@@ -45,7 +45,7 @@ class UserController {
     const deletedUser = await User.findByIdAndRemove(userId);
 
     if (!deletedUser) {
-      throw new Error("Usuário não encontrado.");
+      throw new Error("User not found");
     }
 
     return deletedUser;

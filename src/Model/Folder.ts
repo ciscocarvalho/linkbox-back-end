@@ -3,7 +3,7 @@ import { ILink, linkSchema } from "./Link";
 
 export interface IFolder extends Document {
   name: String;
-  descricao: String;
+  description: String;
   color: String;
   link: ILink[];
   folder: IFolder[];
@@ -14,7 +14,7 @@ export const FolderSchema = new Schema({
     type: String,
     required: true,
   },
-  descricao: {
+  description: {
     type: String,
     required: false,
   },

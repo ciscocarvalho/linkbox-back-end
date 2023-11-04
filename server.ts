@@ -6,12 +6,12 @@ const PORT = process.env.PORT || 3000;
 
 async function startDB() {
   await connectToMongoDB();
-  console.log("Conexão com o MongoDB estabelecida com sucesso.");
+  console.log("MongoDB connected successfully");
 }
 
 export function startServer() {
   app.listen(PORT, () => {
-    console.log(`Servidor rodando na porta ${PORT}...`);
+    console.log(`Server listening on port ${PORT}...`);
   });
 }
 

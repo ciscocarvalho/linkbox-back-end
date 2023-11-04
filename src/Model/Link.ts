@@ -2,7 +2,7 @@ import { Schema, Document, model } from "mongoose";
 
 export interface ILink extends Document {
   name: String;
-  descricao: String;
+  description: String;
   color: String;
   image: String;
 }
@@ -12,7 +12,7 @@ export const linkSchema = new Schema({
     type: String,
     required: true,
   },
-  descricao: {
+  description: {
     type: String,
     required: false,
   },

@@ -34,7 +34,7 @@ const userPayload: Partial<IUser> = {
 };
 
 const userInput: Partial<IUser> = {
-  email: "teste@@1gmail.com",
+  email: "test@@1gmail.com",
   password: "90909090",
   dashboards: [],
 };
@@ -87,7 +87,7 @@ describe("Users", () => {
           Validations.checkToken(req, res, mockNext);
 
           expect(res.status).toHaveBeenCalledWith(403);
-          expect(res.send).toHaveBeenCalledWith("Token não fornecido.");
+          expect(res.send).toHaveBeenCalledWith("Token is required");
           expect(mockNext).not.toHaveBeenCalled();
         });
         it("Should call the next function if the token is valid ", () => {

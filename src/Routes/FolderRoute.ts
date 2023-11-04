@@ -13,7 +13,7 @@ router.post("/:userId/:dashboardId", async (req: Request, res: Response) => {
     const f = await FolderController.post(userId, dashboardId, clone, path);
     res.status(200).json(f);
   } catch (error) {
-    res.status(400).json({ msg: error });
+    res.status(400).json({ msg: error.message });
   }
 });
 
@@ -26,7 +26,7 @@ router.post("/:userId/:dashboardId/*", async (req: Request, res: Response) => {
     const f = await FolderController.post(userId, dashboardId, clone, path);
     res.status(200).json(f);
   } catch (error) {
-    res.status(400).json({ msg: error });
+    res.status(400).json({ msg: error.message });
   }
 });
 
@@ -37,7 +37,7 @@ router.get("/:userId/:dashboardId", async (req: Request, res: Response) => {
     const f = await FolderController.getAll(userId, dashboardId);
     res.status(200).json(f);
   } catch (error) {
-    res.status(400).json(error);
+    res.status(400).json({ msg: error.message });
   }
 });
 
@@ -50,7 +50,7 @@ router.put("/:userId/:dashboardId/:*", async (req: Request, res: Response) => {
     const f = await FolderController.put(userId, dashboardId, path, updatedFolderData);
     res.status(200).json(f);
   } catch (error) {
-    res.status(400).json(error);
+    res.status(400).json({ msg: error.message });
   }
 });
 
@@ -62,7 +62,7 @@ router.delete("/:userId/:dashboardId/*", async (req: Request, res: Response) => 
     const f = await FolderController.delete(userId, dashboardId, path);
     res.status(200).json(f);
   } catch (error) {
-    res.status(400).json(error);
+    res.status(400).json({ msg: error.message });
   }
 });
 

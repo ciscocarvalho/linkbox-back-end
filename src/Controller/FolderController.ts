@@ -7,13 +7,13 @@ class FolderController {
     const user = await User.findById(userId);
 
     if (!user) {
-      throw new Error("erro ao encontrar o usuário");
+      throw new Error("User not found");
     }
 
     const dashboard = user.dashboards.find((d) => d.title.toString() === dashboardId);
 
     if (!dashboard) {
-      throw new Error("erro ao encontrar a dashboard");
+      throw new Error("Dashboard not found");
     }
 
     if (!path) {
@@ -33,13 +33,13 @@ class FolderController {
     const user = await User.findById(userId);
 
     if (!user) {
-      throw new Error("usuário não encontrado");
+      throw new Error("User not found");
     }
 
     const dashboard = user.dashboards.find((d) => d.title.toString() === dashboardId);
 
     if (!dashboard) {
-      throw new Error("Dashboard não encontrada");
+      throw new Error("Dashboard not found");
     }
 
     const folders = dashboard.folder;
@@ -51,17 +51,17 @@ class FolderController {
     const user = await User.findById(userId);
 
     if (!user) {
-      throw new Error("usuário não encontrado");
+      throw new Error("User not found");
     }
 
     const dashboard = user.dashboards.find((d) => d.title.toString() === dashboardId);
 
     if (!dashboard) {
-      throw new Error("Dashboard não encontrada");
+      throw new Error("Dashboard not found");
     }
 
     if (!path) {
-      throw new Error("pasta não encontrada.");
+      throw new Error("Folder not found");
     } else {
       const f = dashboard.folder;
       const pathArray = path.split("/");
@@ -75,17 +75,17 @@ class FolderController {
     const user = await User.findById(userId);
 
     if (!user) {
-      throw new Error("usuário não encontrado");
+      throw new Error("User not found");
     }
 
     const dashboard = user.dashboards.find((d) => d.title.toString() === dashboardId);
 
     if (!dashboard) {
-      throw new Error("Dashboard não encontrada");
+      throw new Error("Dashboard not found");
     }
 
     if (!path) {
-      throw new Error("pasta não encontrada.");
+      throw new Error("Folder not found");
     } else {
       const f = dashboard.folder;
       const pathArray = path.split("/");

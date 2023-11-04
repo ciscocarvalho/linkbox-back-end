@@ -29,13 +29,13 @@ class AuthController {
     const user = await User.findOne({ email: email });
 
     if (!user) {
-      throw new Error("error usuário não encontrado");
+      throw new Error("User not found");
     }
 
     const passwordIsValid = bcrypt.compareSync(password, user.password.toString());
 
     if (!passwordIsValid) {
-      throw new Error("Invalid Email or Password!");
+      throw new Error("Invalid password");
     }
     const token = AuthController.genToken(user);
 

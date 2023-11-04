@@ -6,7 +6,7 @@ class DashboardController {
     const user = await User.findById(userId);
 
     if (!user) {
-      throw new Error("erro usuário não encontrado");
+      throw new Error("User not found");
     }
 
     user.dashboards.push(dashboard);
@@ -19,7 +19,7 @@ class DashboardController {
     const user = await User.findById(userId);
 
     if (!user) {
-      throw new Error("usuário não encontrado");
+      throw new Error("User not found");
     }
 
     const dashboards = user.dashboards;
@@ -31,13 +31,13 @@ class DashboardController {
     const user = await User.findById(userId);
 
     if (!user) {
-      throw new Error("Usuário não encontrado.");
+      throw new Error("User not found");
     }
 
     const dashboard = user.dashboards.find((d) => d.title.toString() === dashboardId);
 
     if (!dashboard) {
-      throw new Error("Dashboard não encontrada.");
+      throw new Error("Dashboard not found");
     }
 
     return dashboard;
@@ -47,7 +47,7 @@ class DashboardController {
     const user = await User.findById(userId);
 
     if (!user) {
-      throw new Error("Usuário não encontrado.");
+      throw new Error("User not found");
     }
 
     const dashboard = user.dashboards.find((d) => d.title.toString() === dashboardId);
@@ -63,7 +63,7 @@ class DashboardController {
     const user = await User.findById(userId);
 
     if (!user) {
-      throw new Error("Usuário não encontrado.");
+      throw new Error("User not found");
     }
 
     const updatedUser = await User.findOneAndUpdate(

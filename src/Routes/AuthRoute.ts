@@ -9,7 +9,7 @@ router.post("/signup", async (req: Request, res: Response) => {
     const userSaved = await AuthController.signup(clone);
     res.status(201).json(userSaved.email);
   } catch (err) {
-    res.status(400).send(err.message);
+    res.status(400).send({ msg: err.message });
   }
 });
 
@@ -25,7 +25,7 @@ router.post("/signin", async (req: Request, res: Response) => {
     });
     res.json({ auth: true, user: userData, token: token });
   } catch (err) {
-    res.status(401).send({ auth: false, token: null, message: err.message });
+    res.status(401).send({ auth: false, token: null, msg: err.message });
   }
 });
 

@@ -7,12 +7,12 @@ class LinkController {
     const user = await User.findById(userId);
 
     if (!user) {
-      throw new Error("Usuário não encontrado");
+      throw new Error("User not found");
     }
     const dashboard = user.dashboards.find((d) => d.title.toString() === dashboardId);
 
     if (!dashboard) {
-      throw new Error("Dashboard não encontrada");
+      throw new Error("Dashboard not found");
     }
 
     if (!path) {
@@ -33,13 +33,13 @@ class LinkController {
     const user = await User.findById(userId);
 
     if (!user) {
-      throw new Error("usuário não encontrado");
+      throw new Error("User not found");
     }
 
     const dashboard = user.dashboards.find((d) => d.title.toString() === dashboardId);
 
     if (!dashboard) {
-      throw new Error("Dashboard não encontrada");
+      throw new Error("Dashboard not found");
     }
 
     const links = dashboard.link;
@@ -51,17 +51,17 @@ class LinkController {
     const user = await User.findById(userId);
 
     if (!user) {
-      throw new Error("Usuário não encontrado");
+      throw new Error("User not found");
     }
 
     const dashboard = user.dashboards.find((d) => d.title.toString() === dashboardId);
 
     if (!dashboard) {
-      throw new Error("Dashboard não encontrada");
+      throw new Error("Dashboard not found");
     }
 
     if (!path) {
-      throw new Error("pasta não encontrada.");
+      throw new Error("Folder not found");
     }
 
     const f = dashboard.folder;
@@ -80,17 +80,17 @@ class LinkController {
     const user = await User.findById(userId);
 
     if (!user) {
-      throw Error("usuário não encontrado");
+      throw Error("User not found");
     }
 
     const dashboard = user.dashboards.find((d) => d.title.toString() === dashboardId);
 
     if (!dashboard) {
-      throw Error("Dashboard não encontrada");
+      throw Error("Dashboard not found");
     }
 
     if (!path) {
-      throw Error("pasta não encontrada.");
+      throw Error("Folder not found");
     }
 
     const f = dashboard.folder;

@@ -581,7 +581,7 @@ components:
       properties:
         name:
           type: String
-        descricao:
+        description:
           type: String
         color:
           type: String
@@ -595,7 +595,7 @@ components:
       properties:
         name:
           type: String
-        descricao:
+        description:
           type: String
         color:
           type: String

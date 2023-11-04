@@ -6,12 +6,12 @@ class Validations {
     const token = req.cookies.token;
 
     if (!token) {
-      return res.status(403).send("Token não fornecido.");
+      return res.status(403).send("Token is required");
     }
 
     jwt.verify(token, process.env.SECRET, (err: jwt.VerifyErrors) => {
       if (err) {
-        return res.status(401).send("Token inválido.");
+        return res.status(401).send("Invalid token");
       }
 
       Next();
