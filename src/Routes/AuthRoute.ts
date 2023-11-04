@@ -19,7 +19,7 @@ router.post("/signin", async (req: Request, res: Response) => {
     const { token, userData } = await AuthController.signin(clone.email, clone.password);
     res.cookie("token", token, {
       maxAge: 3600000,
-      httpOnly: true,
+      httpOnly: false,
       sameSite: "strict",
       secure: false,
     });
