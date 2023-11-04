@@ -19,7 +19,6 @@ router.post("/:userId/:dashboardId/*", async (req: Request, res: Response) => {
 
 router.post("/:userId/:dashboardId", async (req: Request, res: Response) => {
   try {
-    console.log("09090");
     const userId = req.params.userId;
     const dashboardId = req.params.dashboardId;
     const path = req.params[0];

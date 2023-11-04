@@ -64,7 +64,6 @@ class LinkController {
       throw new Error("pasta não encontrada.");
     }
 
-    console.log("1");
     const f = dashboard.folder;
     const pathArray = path.split("/");
     const nomeDoLink = pathArray.pop();
@@ -97,9 +96,6 @@ class LinkController {
     const f = dashboard.folder;
     const pathArray = path.split("/");
     const link = await percorrerPath(pathArray, f);
-    const areaLink = link[0];
-    const linkk = areaLink.link;
-    console.log(linkk);
 
     await user.save();
     return link;

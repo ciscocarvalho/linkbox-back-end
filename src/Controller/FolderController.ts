@@ -5,7 +5,6 @@ import { percorrerPath } from "../util/util";
 class FolderController {
   static async post(userId: string, dashboardId: string, clone: IFolder, path = "") {
     const user = await User.findById(userId);
-    console.log("0");
 
     if (!user) {
       throw new Error("erro ao encontrar o usuário");
@@ -18,12 +17,10 @@ class FolderController {
     }
 
     if (!path) {
-      console.log("2");
       dashboard.folder.push(clone);
       await user.save();
       return dashboard;
     } else {
-      console.log("1");
       const f = dashboard.folder;
       const pathArray = path.split("/");
       const destinationfolder = await percorrerPath(pathArray, f);
@@ -93,9 +90,7 @@ class FolderController {
       const f = dashboard.folder;
       const pathArray = path.split("/");
       const toDeleteFolder = await percorrerPath(pathArray, f);
-      console.log(toDeleteFolder);
       toDeleteFolder.remove();
-      console.log("------------------");
 
       await user.save();
       return dashboard;
