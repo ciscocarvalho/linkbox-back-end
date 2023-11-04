@@ -1,6 +1,6 @@
 import { Connection, connect, connection } from "mongoose";
 
-const mongoURL = "mongodb://127.0.0.1:27017/person";
+const mongoURL = process.env.DB_URL;
 
 async function connectToMongoDB(): Promise<Connection> {
   try {
