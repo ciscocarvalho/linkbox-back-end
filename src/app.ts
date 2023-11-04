@@ -3,12 +3,18 @@ import routes from "./Routes/index";
 import cookieParser from "cookie-parser";
 import swaggerUi from "swagger-ui-express";
 import YAML from "yamljs";
+import cors from "cors";
 
 const swaggerDocument = YAML.load("./openapi.yml");
 const app = express();
+const FRONTEND_URL = process.env.FRONTEND_URL;
 
 app.use(express.json());
 app.use(cookieParser());
+app.use(cors({
+  origin: FRONTEND_URL,
+  credentials: true,
+}));
 
 app.use("/api-docs", swaggerUi.serve);
 app.get("/api-docs", swaggerUi.setup(swaggerDocument));
