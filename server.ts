@@ -9,11 +9,15 @@ async function startDB() {
   console.log("MongoDB connected successfully");
 }
 
-export function startServer() {
+function startServer() {
   app.listen(PORT, () => {
     console.log(`Server listening on port ${PORT}...`);
   });
 }
 
-startDB();
-startServer();
+async function main() {
+  await startDB();
+  startServer();
+}
+
+main();
