@@ -1,6 +1,6 @@
 import { IFolder } from "../Model/Folder";
 import User from "../Model/User";
-import { percorrerPath } from "../util/util";
+import { traversePath } from "../util/util";
 
 class FolderController {
   static async post(userId: string, dashboardId: string, clone: IFolder, path = "") {
@@ -23,7 +23,7 @@ class FolderController {
     } else {
       const f = dashboard.folder;
       const pathArray = path.split("/");
-      const destinationfolder = await percorrerPath(pathArray, f);
+      const destinationfolder = await traversePath(pathArray, f);
       destinationfolder.push(clone);
       await user.save();
       return dashboard;
@@ -65,7 +65,7 @@ class FolderController {
     } else {
       const f = dashboard.folder;
       const pathArray = path.split("/");
-      const destinationfolder = await percorrerPath(pathArray, f);
+      const destinationfolder = await traversePath(pathArray, f);
       Object.assign(destinationfolder, updatedFolderData);
       await user.save();
       return dashboard;
@@ -89,7 +89,7 @@ class FolderController {
     } else {
       const f = dashboard.folder;
       const pathArray = path.split("/");
-      const toDeleteFolder = await percorrerPath(pathArray, f);
+      const toDeleteFolder = await traversePath(pathArray, f);
       toDeleteFolder.remove();
 
       await user.save();

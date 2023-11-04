@@ -1,6 +1,6 @@
 import { ILink } from "../Model/Link";
 import User from "../Model/User";
-import { percorrerPath, percorrerPathLink } from "../util/util";
+import { traversePath, traversePathLink } from "../util/util";
 
 class LinkController {
   static async post(userId: string, dashboardId: string, linkData: ILink, path: string) {
@@ -22,7 +22,7 @@ class LinkController {
     } else {
       const f = dashboard.folder;
       const pathArray = path.split("/");
-      const destinationfolder = await percorrerPathLink(pathArray, f);
+      const destinationfolder = await traversePathLink(pathArray, f);
       const area = destinationfolder.link;
       area.push(linkData);
       await user.save();
@@ -67,7 +67,7 @@ class LinkController {
     const f = dashboard.folder;
     const pathArray = path.split("/");
     const nomeDoLink = pathArray.pop();
-    const destinationfolder = await percorrerPathLink(pathArray, f);
+    const destinationfolder = await traversePathLink(pathArray, f);
     const area = destinationfolder.link as [ILink];
     const linkToUpadte = area.filter((element) => {
       return element.name.toString() === nomeDoLink;
@@ -95,7 +95,7 @@ class LinkController {
 
     const f = dashboard.folder;
     const pathArray = path.split("/");
-    const link = await percorrerPath(pathArray, f);
+    const link = await traversePath(pathArray, f);
 
     await user.save();
     return link;
