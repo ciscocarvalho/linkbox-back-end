@@ -5,11 +5,8 @@ import connectToMongoDB from "./src/database";
 const PORT = process.env.PORT || 3000;
 
 async function startDB() {
-  try {
-    await connectToMongoDB();
-  } catch (error) {
-    console.error("Erro durante a inicialização da aplicação:", error);
-  }
+  await connectToMongoDB();
+  console.log("Conexão com o MongoDB estabelecida com sucesso.");
 }
 
 export function startServer() {

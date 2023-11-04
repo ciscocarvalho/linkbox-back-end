@@ -19,21 +19,17 @@ class AuthController {
   }
 
   static async signup(userT: IUser) {
-    try {
-      userT.password = bcrypt.hashSync(userT.password.toString(), SALT);
-      const newUser = new User(userT);
-      await newUser.save();
-      return newUser;
-    } catch (err) {
-      throw new Error(err.message);
-    }
+    userT.password = bcrypt.hashSync(userT.password.toString(), SALT);
+    const newUser = new User(userT);
+    await newUser.save();
+    return newUser;
   }
 
   static async signin(email: string, password: string) {
     const user = await User.findOne({ email: email });
 
     if (!user) {
-      throw "error usuário não encontrado";
+      throw new Error("error usuário não encontrado");
     }
 
     const passwordIsValid = bcrypt.compareSync(password, user.password.toString());
