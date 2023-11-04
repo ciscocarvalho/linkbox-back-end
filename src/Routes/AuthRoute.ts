@@ -7,7 +7,7 @@ router.post("/signup", async (req: Request, res: Response) => {
   try {
     const clone = { ...req.body };
     const userSaved = await AuthController.signup(clone);
-    res.status(201).json(userSaved.email);
+    res.status(201).json({ email: userSaved.email });
   } catch (err) {
     res.status(400).send({ msg: err.message });
   }
