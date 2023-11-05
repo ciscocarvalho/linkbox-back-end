@@ -4,7 +4,7 @@ import { IFolder, FolderSchema } from "./Folder";
 
 export interface IDashboard extends Document {
   title: String;
-  link: [ILink];
+  link: ILink[];
   folder: IFolder[];
 }
 
