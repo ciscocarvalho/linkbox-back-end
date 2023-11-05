@@ -71,7 +71,7 @@ describe("Users", () => {
 
         const { statusCode, body } = await supertest(app).post("/auth/signup");
         expect(statusCode).toBe(201);
-        expect(body).toEqual(userPayload.email);
+        expect(body).toEqual({ email: userPayload.email });
       });
     });
   });
