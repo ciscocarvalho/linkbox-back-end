@@ -1,67 +1,51 @@
-import { Request, Response, Router } from "express";
+import { Router } from "express";
 import LinkController from "../Controller/LinkController";
-import { ILink } from "../Model/Link";
+import isAuthenticated from "../Middlewares/isAuthenticated";
+import { ILink } from "../Model/User";
+import { LinkRequest, getLinkDataFromRequest } from "./util/link";
 
 const router = Router();
 
-router.post("/:userId/:dashboardId/*", async (req: Request, res: Response) => {
+router.use(isAuthenticated);
+
+router.post(["/:dashboardName", "/:dashboardName/*"], async (req: LinkRequest, res) => {
   try {
-    const userId = req.params.userId;
-    const dashboardId = req.params.dashboardId;
-    const path = req.params[0];
+    const { userId, dashboardName, path } = getLinkDataFromRequest(req);
     const linkData: ILink = { ...req.body };
-    const l = await LinkController.post(userId, dashboardId, linkData, path);
+    const l = await LinkController.create(userId, dashboardName, linkData, path);
     res.status(200).json(l);
-  } catch (error) {
+  } catch (error: any) {
     res.status(400).json({ msg: error.message });
   }
 });
 
-router.post("/:userId/:dashboardId", async (req: Request, res: Response) => {
+router.get(["/:dashboardName", "/:dashboardName/*"], async (req: LinkRequest, res) => {
   try {
-    const userId = req.params.userId;
-    const dashboardId = req.params.dashboardId;
-    const path = req.params[0];
-    const linkData: ILink = { ...req.body };
-    const l = await LinkController.post(userId, dashboardId, linkData, path);
+    const { userId, dashboardName, path } = getLinkDataFromRequest(req);
+    const l = await LinkController.getByPath(userId, dashboardName, path);
     res.status(200).json(l);
-  } catch (error) {
+  } catch (error: any) {
     res.status(400).json({ msg: error.message });
   }
 });
 
-router.get("/:userId/:dashboardId", async (req: Request, res: Response) => {
+router.put(["/:dashboardName", "/:dashboardName/*"], async (req: LinkRequest, res) => {
   try {
-    const userId = req.params.userId;
-    const dashboardId = req.params.dashboardId;
-    const l = await LinkController.getAllInDashboard(userId, dashboardId);
+    const { userId, dashboardName, path } = getLinkDataFromRequest(req);
+    const updatedLinkData = { ...req.body };
+    const l = await LinkController.update(userId, dashboardName, path, updatedLinkData);
     res.status(200).json(l);
-  } catch (error) {
-    res.status(400).json({ msg: error.message });
-  }
-});
-
-router.put("/:userId/:dashboardId/*", async (req: Request, res: Response) => {
-  try {
-    const userId = req.params.userId;
-    const dashboardId = req.params.dashboardId;
-    const path = req.params[0];
-    const updatedLinkData = req.body;
-    const l = await LinkController.put(userId, dashboardId, path, updatedLinkData);
-    res.status(200).json(l);
-  } catch (error) {
+  } catch (error: any) {
     res.status(200).json({ msg: error.message });
   }
 });
 
-router.delete("/:userId/:dashboardId/*", async (req: Request, res: Response) => {
+router.delete(["/:dashboardName", "/:dashboardName/*"], async (req: LinkRequest, res) => {
   try {
-    const userId = req.params.userId;
-    const dashboardId = req.params.dashboardId;
-    const path = req.params[0];
-    const l = LinkController.delete(userId, dashboardId, path);
+    const { userId, dashboardName, path } = getLinkDataFromRequest(req);
+    const l = await LinkController.delete(userId, dashboardName, path);
     res.status(200).json(l);
-  } catch (error) {
+  } catch (error: any) {
     res.status(400).json({ msg: error.message });
   }
 });

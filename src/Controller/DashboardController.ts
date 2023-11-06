@@ -1,75 +1,62 @@
-import { IDashboard } from "../Model/Dashboard";
-import User from "../Model/User";
+import { ObjectId } from "mongodb";
+import User, { IDashboard } from "../Model/User";
+import { getDashboardOrThrowError, getUserOrThrowError } from "../util/controller";
 
 class DashboardController {
-  static async post(userId: string, dashboard: IDashboard) {
-    const user = await User.findById(userId);
+  static async create(userId: string, dashboard: IDashboard) {
+    const user = await getUserOrThrowError(userId);
+    const { dashboards } = user;
+    const dashboardNameTaken = !!dashboards.find((thisDashboard) => thisDashboard.name === dashboard.name);
 
-    if (!user) {
-      throw new Error("User not found");
+    if (dashboardNameTaken) {
+      throw new Error("Dashboard name already taken");
     }
 
-    user.dashboards.push(dashboard);
-    await user.save();
+    dashboard.tree = { items: [], _id: new ObjectId().toString() };
 
+    dashboards.push(dashboard);
+
+    await user.save();
     return user;
   }
 
   static async getAll(userId: string) {
-    const user = await User.findById(userId);
-
-    if (!user) {
-      throw new Error("User not found");
-    }
-
+    const user = await getUserOrThrowError(userId);
     const dashboards = user.dashboards;
 
     return dashboards;
   }
 
-  static async getById(dashboardId: string, userId: string) {
-    const user = await User.findById(userId);
+  static async getByName(dashboardName: string, userId: string) {
+    const user = await getUserOrThrowError(userId);
+    const { dashboard } = getDashboardOrThrowError(user, dashboardName);
 
-    if (!user) {
-      throw new Error("User not found");
-    }
+    return dashboard;
+  }
 
-    const dashboard = user.dashboards.find((d) => d.title.toString() === dashboardId);
+  static async update(dashboardName: string, userId: string, updatedDashboardData: Partial<IDashboard>) {
+    const user = await getUserOrThrowError(userId);
+    const { dashboards } = user;
+    const dashboardIndex = user.dashboards.findIndex((d) => d.name === dashboardName);
+    const dashboard = dashboards[dashboardIndex];
 
     if (!dashboard) {
       throw new Error("Dashboard not found");
     }
 
-    return dashboard;
-  }
-
-  static async put(dashboardId: string, userId: string, updatedDashboardData: Partial<IDashboard>) {
-    const user = await User.findById(userId);
-
-    if (!user) {
-      throw new Error("User not found");
-    }
-
-    const dashboard = user.dashboards.find((d) => d.title.toString() === dashboardId);
-
-    Object.assign(dashboard, updatedDashboardData);
+    dashboards[dashboardIndex] = Object.assign(dashboard, updatedDashboardData);
 
     await user.save();
-
     return dashboard;
   }
 
-  static async delete(userId: string, dashboardId: string) {
-    const user = await User.findById(userId);
-
-    if (!user) {
-      throw new Error("User not found");
-    }
+  static async delete(dashboardName: string, userId: string) {
+    await getUserOrThrowError(userId);
 
     const updatedUser = await User.findOneAndUpdate(
       { _id: userId },
       {
-        $pull: { dashboards: { _id: dashboardId } },
+        $pull: { dashboards: { name: dashboardName } },
       },
       { new: true },
     );

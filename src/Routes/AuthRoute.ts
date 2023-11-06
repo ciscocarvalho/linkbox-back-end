@@ -1,19 +1,19 @@
-import { Request, Response, Router } from "express";
+import { Router } from "express";
 import AuthController from "../Controller/AuthController";
 
 const router = Router();
 
-router.post("/signup", async (req: Request, res: Response) => {
+router.post("/signup", async (req, res) => {
   try {
     const clone = { ...req.body };
     const userSaved = await AuthController.signup(clone);
     res.status(201).json({ email: userSaved.email });
-  } catch (err) {
+  } catch (err: any) {
     res.status(400).send({ msg: err.message });
   }
 });
 
-router.post("/signin", async (req: Request, res: Response) => {
+router.post("/signin", async (req, res) => {
   try {
     const clone = { ...req.body };
     const { token, userData } = await AuthController.signin(clone.email, clone.password);
@@ -24,8 +24,17 @@ router.post("/signin", async (req: Request, res: Response) => {
       secure: false,
     });
     res.json({ auth: true, user: userData, token: token });
-  } catch (err) {
+  } catch (err: any) {
     res.status(401).send({ auth: false, token: null, msg: err.message });
+  }
+});
+
+router.post("/signout", async (req, res) => {
+  try {
+    res.clearCookie("token");
+    res.status(201);
+  } catch (err: any) {
+    res.status(401).send({ msg: err.message });
   }
 });
 

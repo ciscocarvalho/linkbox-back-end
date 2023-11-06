@@ -2,7 +2,7 @@ import User, { IUser } from "../Model/User";
 import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
 
-const SALT = 3;
+const ROUNDS = parseInt(process.env.ROUNDS!);
 
 class AuthController {
   static user: IUser;
@@ -12,16 +12,15 @@ class AuthController {
   }
 
   static genToken(user: IUser) {
-    const token = jwt.sign({ id: user.id }, process.env.SECRET, {
+    const token = jwt.sign({ id: user.id }, process.env.SECRET!, {
       expiresIn: "1h",
     });
     return token;
   }
 
   static async signup(userT: IUser) {
-    userT.password = bcrypt.hashSync(userT.password.toString(), SALT);
-    const newUser = new User(userT);
-    await newUser.save();
+    userT.password = bcrypt.hashSync(userT.password, ROUNDS);
+    const newUser = await new User(userT).save();
     return newUser;
   }
 
@@ -32,7 +31,7 @@ class AuthController {
       throw new Error("User not found");
     }
 
-    const passwordIsValid = bcrypt.compareSync(password, user.password.toString());
+    const passwordIsValid = bcrypt.compareSync(password, user.password);
 
     if (!passwordIsValid) {
       throw new Error("Invalid password");

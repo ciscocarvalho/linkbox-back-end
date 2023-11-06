@@ -1,16 +1,22 @@
 import { Router } from "express";
-import usersRoutes from "./UserRoute";
-import dashboardRoutes from "./DashboardRoute";
-import folderRoutes from "./FolderRoute";
-import linkRoutes from "./LinkRoute";
-import authRoutes from "./AuthRoute";
+import meRoute from "./meRoute";
+import dashboardRoute from "./DashboardRoute";
+import folderRoute from "./FolderRoute";
+import linkRoute from "./LinkRoute";
+import authRoute from "./AuthRoute";
+import pathRoute from "./pathRoute";
+import moveRoute from "./moveRoute";
+import repositionRoute from "./repositionRoute";
 
 const router = Router();
 
-router.use("/users", usersRoutes);
-router.use("/auth", authRoutes);
-router.use("/dashboards", dashboardRoutes);
-router.use("/folders", folderRoutes);
-router.use("/links", linkRoutes);
+router.use("/me", meRoute);
+router.use("/auth", authRoute);
+router.use("/dashboards", dashboardRoute);
+router.use("/folders", folderRoute);
+router.use("/links", linkRoute);
+router.use("/path", pathRoute);
+router.use("/move", moveRoute);
+router.use("/reposition", repositionRoute);
 
 export default router;

@@ -1,100 +1,167 @@
-import { IFolder } from "../Model/Folder";
-import User from "../Model/User";
-import { traversePath } from "../util/util";
+import { ObjectId } from "mongodb";
+import { AnyFolder, IFolder, IUser } from "../Model/User";
+import { getDashboardOrThrowError, getFolderOrThrowError, getUserOrThrowError } from "../util/controller";
+import { getLocationFromPath, getParentFolderFromPath, getParentLocation, isFolder } from "../util/util";
+
+const folderNameIsAlreadyUsed = (parent: AnyFolder, name: string) => {
+  return !!parent.items.find((item) => isFolder(item) && item.name === name);
+}
+
+const add = async (user: IUser, dashboardName: string, folderData: IFolder, path: string) => {
+  const { dashboard, dashboardIndex } = getDashboardOrThrowError(user, dashboardName);
+
+  const location = getLocationFromPath(path);
+  const destinationFolder = getFolderOrThrowError(dashboard, location).folder;
+
+  if (folderNameIsAlreadyUsed(destinationFolder, folderData.name)) {
+    throw new Error("Folder name already used");
+  }
+
+  if (!folderData.items) {
+    folderData.items = [];
+  }
+
+  destinationFolder.items.push(folderData);
+
+  user.dashboards[dashboardIndex] = dashboard;
+}
+
+const remove = async (user: IUser, dashboardName: string, path: string) => {
+  const { dashboard, dashboardIndex } = getDashboardOrThrowError(user, dashboardName);
+
+  const root = dashboard.tree;
+  const parentFolder = getParentFolderFromPath(path, root)
+
+  const location = getLocationFromPath(path);
+  const folder = getFolderOrThrowError(dashboard, location).folder;
+
+  if (parentFolder) {
+    parentFolder.items = parentFolder.items.filter((item) => item !== folder);
+  } else {
+    dashboard.tree.items = [];
+  }
+
+  user.dashboards[dashboardIndex] = dashboard;
+
+  return folder;
+}
+
+const swap = <T>(arr: T[], firstIndex: number, secondIndex: number) => {
+    const firstItem = arr[firstIndex];
+    arr[firstIndex] = arr[secondIndex];
+    arr[secondIndex] = firstItem;
+}
+
+const moveToNewIndex = <T>(arr: T[], currentIndex: number, newIndex: number) => {
+    if (currentIndex === newIndex) {
+        return;
+    }
+
+    if (currentIndex > newIndex) {
+        for (; currentIndex > newIndex; currentIndex--) {
+            swap(arr, currentIndex, currentIndex - 1);
+        }
+    } else if (currentIndex < newIndex) {
+        for (; currentIndex < newIndex; currentIndex++) {
+            swap(arr, currentIndex, currentIndex + 1);
+        }
+    }
+}
+
+const reorderArray = <T>(arr: T[], currentIndex: number, newIndex: number, strategy: "before" | "after" = "after") => {
+    if (!arr[currentIndex] || !arr[newIndex]) {
+        return arr;
+    }
+
+    if (currentIndex > newIndex && strategy === "after") {
+        newIndex = newIndex + 1;
+    } else if (currentIndex < newIndex && strategy === "before") {
+        newIndex = newIndex - 1;
+    }
+
+    moveToNewIndex(arr, currentIndex, newIndex);
+};
 
 class FolderController {
-  static async post(userId: string, dashboardId: string, clone: IFolder, path = "") {
-    const user = await User.findById(userId);
-
-    if (!user) {
-      throw new Error("User not found");
-    }
-
-    const dashboard = user.dashboards.find((d) => d.title.toString() === dashboardId);
-
-    if (!dashboard) {
-      throw new Error("Dashboard not found");
-    }
-
-    if (!path) {
-      dashboard.folder.push(clone);
-      await user.save();
-      return dashboard;
-    } else {
-      const f = dashboard.folder;
-      const pathArray = path.split("/");
-      const destinationfolder = await traversePath(pathArray, f);
-      destinationfolder.push(clone);
-      await user.save();
-      return dashboard;
-    }
-  }
-  static async getAll(userId: string, dashboardId: string) {
-    const user = await User.findById(userId);
-
-    if (!user) {
-      throw new Error("User not found");
-    }
-
-    const dashboard = user.dashboards.find((d) => d.title.toString() === dashboardId);
-
-    if (!dashboard) {
-      throw new Error("Dashboard not found");
-    }
-
-    const folders = dashboard.folder;
-
-    return folders;
+  static async create(userId: string, dashboardName: string, folderData: IFolder, path: string) {
+    const user = await getUserOrThrowError(userId);
+    folderData._id = new ObjectId().toString();
+    await add(user, dashboardName, folderData, path);
+    await user.save();
+    return folderData;
   }
 
-  static async put(userId: string, dashboardId: string, path: string, updatedFolderData: Partial<IFolder>) {
-    const user = await User.findById(userId);
+  static async getByPath(userId: string, dashboardName: string, path: string) {
+    const user = await getUserOrThrowError(userId);
+    const { dashboard } = getDashboardOrThrowError(user, dashboardName);
+    const location = getLocationFromPath(path);
+    const folder = getFolderOrThrowError(dashboard, location).folder;
+    return folder;
+  }
 
-    if (!user) {
-      throw new Error("User not found");
-    }
+  static async update(userId: string, dashboardName: string, path: string, updatedFolderData: Partial<IFolder>) {
+    const user = await getUserOrThrowError(userId);
+    const { dashboard, dashboardIndex } = getDashboardOrThrowError(user, dashboardName);
+    const location = getLocationFromPath(path);
+    const parentLocation = getParentLocation(location);
+    const parentFolder = getFolderOrThrowError(dashboard, parentLocation).folder;
+    const folderName = location[location.length - 1];
+    const parentItems = parentFolder.items;
 
-    const dashboard = user.dashboards.find((d) => d.title.toString() === dashboardId);
+    const folderIndex = parentItems.findIndex((item) => {
+      return isFolder(item) && item.name === folderName;
+    });
 
-    if (!dashboard) {
-      throw new Error("Dashboard not found");
-    }
+    const folder = parentItems[folderIndex];
 
-    if (!path) {
+    if (!folder) {
       throw new Error("Folder not found");
-    } else {
-      const f = dashboard.folder;
-      const pathArray = path.split("/");
-      const destinationfolder = await traversePath(pathArray, f);
-      Object.assign(destinationfolder, updatedFolderData);
-      await user.save();
-      return dashboard;
     }
+
+    delete updatedFolderData._id;
+
+    parentItems[folderIndex] = Object.assign(folder, updatedFolderData);
+    user.dashboards[dashboardIndex] = dashboard;
+
+    await user.save();
+    return folder;
   }
-  static async delete(userId: string, dashboardId: string, path: string) {
-    const user = await User.findById(userId);
 
-    if (!user) {
-      throw new Error("User not found");
-    }
+  static async delete(userId: string, dashboardName: string, path: string) {
+    const user = await getUserOrThrowError(userId);
+    const folder = await remove(user, dashboardName, path);
+    await user.save();
+    return folder;
+  }
 
-    const dashboard = user.dashboards.find((d) => d.title.toString() === dashboardId);
+  static async move(userId: string, dashboardName: string, path: string, targetPath: string) {
+    const user = await getUserOrThrowError(userId);
+    const folder = await remove(user, dashboardName, path) as IFolder;
+    await add(user, dashboardName, folder, targetPath);
+    await user.save();
+    return folder;
+  }
 
-    if (!dashboard) {
-      throw new Error("Dashboard not found");
-    }
+  static async reposition(
+    userId: string,
+    dashboardName: string,
+    path: string,
+    currentIndex: number,
+    newIndex: number,
+    strategy?: "before" | "after",
+  ) {
+    const user = await getUserOrThrowError(userId);
+    const { dashboard, dashboardIndex } = getDashboardOrThrowError(user, dashboardName);
 
-    if (!path) {
-      throw new Error("Folder not found");
-    } else {
-      const f = dashboard.folder;
-      const pathArray = path.split("/");
-      const toDeleteFolder = await traversePath(pathArray, f);
-      toDeleteFolder.remove();
+    const location = getLocationFromPath(path);
+    const folder = getFolderOrThrowError(dashboard, location).folder;
 
-      await user.save();
-      return dashboard;
-    }
+    reorderArray(folder.items, currentIndex, newIndex, strategy);
+
+    user.dashboards[dashboardIndex] = dashboard;
+    await user.save();
+
+    return folder;
   }
 }
 

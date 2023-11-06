@@ -1,67 +1,51 @@
-import { Request, Response, Router } from "express";
+import { Router } from "express";
 import FolderController from "../Controller/FolderController";
-import { IFolder } from "../Model/Folder";
+import isAuthenticated from "../Middlewares/isAuthenticated";
+import { IFolder } from "../Model/User";
+import { FolderRequest, getFolderDataFromRequest } from "./util/folder";
 
 const router = Router();
 
-router.post("/:userId/:dashboardId", async (req: Request, res: Response) => {
+router.use(isAuthenticated);
+
+router.post(["/:dashboardName", "/:dashboardName/*"], async (req: FolderRequest, res) => {
   try {
-    const userId = req.params.userId;
-    const path = req.params[0];
-    const dashboardId = req.params.dashboardId;
+    const { userId, dashboardName, path } = getFolderDataFromRequest(req);
     const clone: IFolder = { ...req.body };
-    const f = await FolderController.post(userId, dashboardId, clone, path);
+    const f = await FolderController.create(userId, dashboardName, clone, path ?? "");
     res.status(200).json(f);
-  } catch (error) {
+  } catch (error: any) {
     res.status(400).json({ msg: error.message });
   }
 });
 
-router.post("/:userId/:dashboardId/*", async (req: Request, res: Response) => {
+router.get(["/:dashboardName", "/:dashboardName/*"], async (req: FolderRequest, res) => {
   try {
-    const userId = req.params.userId;
-    const path = req.params[0];
-    const dashboardId = req.params.dashboardId;
-    const clone: IFolder = { ...req.body };
-    const f = await FolderController.post(userId, dashboardId, clone, path);
+    const { userId, dashboardName, path } = getFolderDataFromRequest(req);
+    const f = await FolderController.getByPath(userId, dashboardName, path ?? "");
     res.status(200).json(f);
-  } catch (error) {
+  } catch (error: any) {
     res.status(400).json({ msg: error.message });
   }
 });
 
-router.get("/:userId/:dashboardId", async (req: Request, res: Response) => {
+router.put(["/:dashboardName", "/:dashboardName/*"], async (req: FolderRequest, res) => {
   try {
-    const userId = req.params.userId;
-    const dashboardId = req.params.dashboardId;
-    const f = await FolderController.getAll(userId, dashboardId);
+    const { userId, dashboardName, path } = getFolderDataFromRequest(req);
+    const updatedFolderData = { ...req.body };
+    const f = await FolderController.update(userId, dashboardName, path ?? "", updatedFolderData);
     res.status(200).json(f);
-  } catch (error) {
+  } catch (error: any) {
     res.status(400).json({ msg: error.message });
   }
 });
 
-router.put("/:userId/:dashboardId/:*", async (req: Request, res: Response) => {
+router.delete(["/:dashboardName", "/:dashboardName/*"], async (req: FolderRequest, res) => {
   try {
-    const userId = req.params.userId;
-    const dashboardId = req.params.dashboardId;
-    const path = req.params[0];
-    const updatedFolderData = req.body;
-    const f = await FolderController.put(userId, dashboardId, path, updatedFolderData);
+    const { userId, dashboardName, path } = getFolderDataFromRequest(req);
+    const f = await FolderController.delete(userId, dashboardName, path ?? "");
     res.status(200).json(f);
-  } catch (error) {
-    res.status(400).json({ msg: error.message });
-  }
-});
-
-router.delete("/:userId/:dashboardId/*", async (req: Request, res: Response) => {
-  try {
-    const userId = req.params.userId;
-    const dashboardId = req.params.dashboardId;
-    const path = req.params[0];
-    const f = await FolderController.delete(userId, dashboardId, path);
-    res.status(200).json(f);
-  } catch (error) {
+  } catch (error: any) {
     res.status(400).json({ msg: error.message });
   }
 });

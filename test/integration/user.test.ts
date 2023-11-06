@@ -9,9 +9,9 @@ import { Request, Response } from "express";
 import jwt from "jsonwebtoken";
 import { IUser } from "../../src/Model/User";
 
-const chave = process.env.SECRET;
+const key = process.env.SECRET!;
 
-const userId = new mongoose.Types.ObjectId().toString();
+const userId = new mongoose.Types.ObjectId();
 
 const mockResponse = () => {
   const res: Response = {} as Response;
@@ -46,7 +46,7 @@ describe("Users", () => {
   });
   afterAll(async () => {
     await mongoose.disconnect();
-    await mongoose.connection.close;
+    await mongoose.connection.close();
   });
   describe("test user validation", () => {
     describe("verify the handle with error", () => {
@@ -91,7 +91,7 @@ describe("Users", () => {
           expect(mockNext).not.toHaveBeenCalled();
         });
         it("Should call the next function if the token is valid ", () => {
-          const token = jwt.sign(userInput, chave);
+          const token = jwt.sign(userInput, key);
           const req: Request = {
             cookies: {
               token: token,

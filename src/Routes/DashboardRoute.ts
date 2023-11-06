@@ -1,61 +1,63 @@
 import DashboardController from "../Controller/DashboardController";
-import { IDashboard } from "../Model/Dashboard";
-import { Request, Response, Router } from "express";
-import Validations from "../util/validation";
+import { Router } from "express";
+import isAuthenticated from "../Middlewares/isAuthenticated";
+import { IDashboard } from "../Model/User";
 
 const router = Router();
 
-router.post("/:userId", Validations.checkToken, async (req: Request, res: Response) => {
+router.use(isAuthenticated);
+
+router.post("/", async (req, res) => {
   try {
-    const userId = req.params.userId;
-    const clone: IDashboard = { ...req.body };
-    const dashboardSaved = await DashboardController.post(userId, clone);
+    const userId = req.session!.userId!;
+    const dashboard: IDashboard = { ...req.body };
+    const dashboardSaved = await DashboardController.create(userId, dashboard);
     res.status(200).json(dashboardSaved);
-  } catch (error) {
+  } catch (error: any) {
     res.status(400).json({ msg: error.message });
   }
 });
 
-router.get("/:userId", async (req: Request, res: Response) => {
+router.get("/", async (req, res) => {
   try {
-    const userId = req.params.userId;
+    const userId = req.session!.userId!;
     const dashboards = await DashboardController.getAll(userId);
-    res.status(200).json(dashboards);
-  } catch (error) {
+    res.status(200).json({ dashboards });
+  } catch (error: any) {
     res.json({ msg: error.message });
   }
 });
 
-router.get("/:userId/:dashboardId", async (req: Request, res: Response) => {
+router.get("/:dashboardName", async (req, res) => {
   try {
-    const dashboardId = req.params.dashboardId;
-    const userId = req.params.userId;
-    const dashboard = await DashboardController.getById(dashboardId, userId);
+    const userId = req.session!.userId!;
+    const { dashboardName } = req.params;
+    const dashboard = await DashboardController.getByName(dashboardName, userId);
     res.status(200).json(dashboard);
-  } catch (error) {
+  } catch (error: any) {
     res.status(400).json({ msg: error });
   }
 });
 
-router.put("/:userId/:dashboardId", async (req: Request, res: Response) => {
+router.put("/:dashboardName", async (req, res) => {
   try {
-    const dashboardId = req.params.dashboardId;
-    const userId = req.params.userId;
-    const updatedDashboardData = req.body;
-    const d = await DashboardController.put(dashboardId, userId, updatedDashboardData);
+    const { dashboardName } = req.params;
+    const userId = req.session!.userId!;
+    const updatedDashboardData = { ...req.body };
+    const d = await DashboardController.update(dashboardName, userId, updatedDashboardData);
     res.status(200).json(d);
-  } catch (error) {
+  } catch (error: any) {
     res.status(400).json({ msg: error.message });
   }
 });
 
-router.delete("/:userId/:dashboardId", async (req: Request, res: Response) => {
+router.delete("/:dashboardName", async (req, res) => {
   try {
-    const dashboardId = req.params.dashboardId;
-    const userId = req.params.userId;
-    const a = await DashboardController.delete(userId, dashboardId);
-    res.status(200).json(a);
-  } catch (error) {
+    const { dashboardName } = req.params;
+    const userId = req.session!.userId!;
+    const u = await DashboardController.delete(dashboardName, userId);
+    res.status(200).json(u);
+  } catch (error: any) {
     res.status(400).json({ msg: error.message });
   }
 });
