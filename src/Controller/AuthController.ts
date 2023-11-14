@@ -1,6 +1,7 @@
 import User, { IUser } from "../Model/User";
 import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
+import { ObjectId } from "mongodb";
 
 const ROUNDS = parseInt(process.env.ROUNDS!);
 
@@ -20,6 +21,21 @@ class AuthController {
 
   static async signup(userT: IUser) {
     userT.password = bcrypt.hashSync(userT.password, ROUNDS);
+    if (!userT.dashboards) {
+      userT.dashboards = [];
+    }
+
+    const defaultDashboard = {
+      name: "default",
+      tree: { items: [], _id: new ObjectId().toString() },
+    };
+
+    const hasDefaultDashboard = userT.dashboards.findIndex(dashboard => dashboard.name === "default") !== -1;
+
+    if (!hasDefaultDashboard) {
+      userT.dashboards.push(defaultDashboard);
+    }
+
     const newUser = await new User(userT).save();
     return newUser;
   }
