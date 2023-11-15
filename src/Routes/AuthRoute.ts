@@ -1,5 +1,6 @@
 import { Router } from "express";
 import AuthController from "../Controller/AuthController";
+import { __prod__ } from "../constants";
 
 const router = Router();
 
@@ -21,7 +22,7 @@ router.post("/signin", async (req, res) => {
       maxAge: 3600000,
       httpOnly: false,
       sameSite: "none",
-      secure: false,
+      secure: __prod__,
     });
     res.json({ auth: true, user: userData, token: token });
   } catch (err: any) {
