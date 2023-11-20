@@ -7,11 +7,11 @@ const checkItemId = (item: IItem, id: string) => {
   return item._id.toString() === id;
 };
 
-const searchLocation = (root: IFolder, predicate: (item: IItem) => boolean) => {
+const searchItemWithLocation = (root: IFolder, predicate: (item: IItem) => boolean) => {
   const location: Location = [root.name];
 
   if (predicate(root)) {
-    return location;
+    return { item: root, location };
   }
 
   const search = ({ items }: IFolder) => {
@@ -20,36 +20,37 @@ const searchLocation = (root: IFolder, predicate: (item: IItem) => boolean) => {
       location.push(item_label);
 
       if (predicate(item)) {
-        return true;
+        return item;
       }
 
       let found = isFolder(item) ? search(item) : false;
 
       if (found) {
-        return true;
+        return item;
       }
 
       location.pop();
     }
-
-    return false;
   };
 
-  const found = search(root);
+  const item = search(root);
 
-  return found ? location : null;
+  return item ? { item, location } : null;
 };
 
 const makePath = (location: Location) => {
   return location.join("/");
 };
 
-export const getItemPath = (root: IFolder, id: string) => {
-  const location = searchLocation(root, (item: IItem) => checkItemId(item, id));
+export const getItemWithPath = (root: IFolder, id: string) => {
+  const itemWithLocation = searchItemWithLocation(root, (item: IItem) => checkItemId(item, id));
 
-  if (!location) {
+  if (!itemWithLocation) {
     return null;
   }
 
-  return makePath(location);
+  return {
+    item: itemWithLocation.item,
+    path: makePath(itemWithLocation.location),
+  }
 };

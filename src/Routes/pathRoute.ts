@@ -1,7 +1,7 @@
 import { Router } from "express";
 import isAuthenticated from "../Middlewares/isAuthenticated";
 import { getUserOrThrowError } from "../util/controller";
-import { getItemPath } from "./util/getItemPath";
+import { getItemWithPath } from "./util/getItemWithPath";
 
 const router = Router();
 
@@ -12,20 +12,20 @@ router.get("/:itemId", async (req, res) => {
     const { itemId } = req.params;
     const userId = req.session!.userId!;
     const user = await getUserOrThrowError(userId);
-    let itemPath = null;
+    let itemWithPath = null;
 
     for (let { name, tree } of user.dashboards) {
-      itemPath = getItemPath({ name, items: tree.items, _id: tree._id }, itemId);
-      if (itemPath) {
+      itemWithPath = getItemWithPath({ name, items: tree.items, _id: tree._id }, itemId);
+      if (itemWithPath) {
         break;
       }
     }
 
-    if (!itemPath) {
+    if (!itemWithPath) {
       throw new Error("Item not found");
     }
 
-    res.status(200).json({ path: itemPath });
+    res.status(200).json({ path: itemWithPath.path });
   } catch (error: any) {
     res.status(400).json({ msg: error.message });
   }
