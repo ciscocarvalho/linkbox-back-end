@@ -82,10 +82,30 @@ const reorderArray = <T>(arr: T[], currentIndex: number, newIndex: number, strat
     moveToNewIndex(arr, currentIndex, newIndex);
 };
 
+const addIdsToFolderAndItems = (folder: IFolder) => {
+  folder._id = new ObjectId().toString();
+
+  let items = [...folder.items];
+
+  while (items.length > 0) {
+    const item = items.pop();
+
+    if (item) {
+      item._id = new ObjectId().toString();
+    }
+
+    if (isFolder(item)) {
+      items = [...items, ...item.items];
+    }
+  }
+
+  return folder;
+}
+
 class FolderController {
   static async create(userId: string, dashboardName: string, folderData: IFolder, path: string) {
     const user = await getUserOrThrowError(userId);
-    folderData._id = new ObjectId().toString();
+    folderData = addIdsToFolderAndItems(folderData);
     await add(user, dashboardName, folderData, path);
     await user.save();
     return folderData;
