@@ -18,11 +18,13 @@ export interface ILink {
 
 export interface IFolder {
   name: string;
-  items: Array<IFolder | ILink>;
+  items: Array<IItem>;
   description?: string;
   color?: string;
   _id: string;
 }
+
+export type IItem = IFolder | ILink;
 
 export interface IRootFolder {
   items: IFolder["items"];

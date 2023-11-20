@@ -1,68 +1,58 @@
 import { Router } from "express";
 import isAuthenticated from "../Middlewares/isAuthenticated";
 import { getUserOrThrowError } from "../util/controller";
-import { AnyFolder, ILink } from "../Model/User";
-import { isFolder, isLink } from "../util/util";
+import { IFolder, IItem, } from "../Model/User";
+import { isFolder } from "../util/util";
 
-type Location = (string | null)[];
+type Location = string[];
 
 const router = Router();
 
 router.use(isAuthenticated);
 
-const getFolderName = (folder: AnyFolder) => {
-  return "name" in folder ? folder.name : null;
+const checkItemId = (item: IItem, id: string) => {
+  return item._id.toString() === id;
 }
 
-const itemsToLocation = (items: (AnyFolder | ILink)[]) => {
-  return items.map((item) => {
-    if (isLink(item)) {
-      return encodeURIComponent(item.url);
-    }
+const searchLocation = (root: IFolder, predicate: (item: IItem) => boolean) => {
+  const location: Location = [root.name];
 
-    return getFolderName(item);
-  })
-}
-
-const searchLocationById = (folder: AnyFolder, id: string): Location => {
-  let folders = [folder];
-  let found = false;
-  let locationItems: (AnyFolder | ILink)[] = [];
-
-  if (folder._id.toString() === id) {
-    found = true;
-    locationItems = [folder];
+  if (predicate(root)) {
+    return location;
   }
 
-  while (folders.length > 0 && !found) {
-    folder = folders.shift()!;
-    locationItems.push(folder);
+  const search = ({ items }: IFolder) => {
+    for (let item of items) {
+      const item_label = isFolder(item) ? item.name : item.url;
+      location.push(item_label);
 
-    for (let folderItem of folder.items) {
-      if (folderItem._id.toString() === id) {
-        found = true;
-        locationItems.push(folderItem);
-        break;
+      if (predicate(item)) {
+        return true;
       }
 
-      if (isFolder(folderItem)) {
-        folders.push(folderItem);
+      let found = isFolder(item) ? search(item) : false;
+
+      if (found) {
+        return true;
       }
+
+      location.pop();
     }
-  }
 
-  if (!found) {
-    locationItems = [];
-  }
+    return false;
+  };
 
-  const location = itemsToLocation(locationItems);
+  const found = search(root);
 
-  return location;
-}
+  return found ? location : null;
+};
 
-const makePath = (dashboardName: string, location: Location) => {
-  location = location.filter(name => name !== null);
-  return [dashboardName, ...location].join("/");
+const searchLocationById = (root: IFolder, id: string) => {
+  return searchLocation(root, (item: IItem) => checkItemId(item, id));
+};
+
+const makePath = (location: Location) => {
+  return location.join("/");
 }
 
 router.get("/:itemId", async (req, res) => {
@@ -70,24 +60,20 @@ router.get("/:itemId", async (req, res) => {
     const { itemId } = req.params;
     const userId = req.session!.userId!;
     const user = await getUserOrThrowError(userId);
-    let dashboardName: string;
-    let location: ReturnType<typeof searchLocationById> = [];
+    let location = null;
 
-    user.dashboards.forEach(({ name, tree }) => {
-      location = searchLocationById(tree, itemId);
-      if (location.length > 0) {
-        dashboardName = name;
-        return;
+    for (let { name, tree } of user.dashboards) {
+      location = searchLocationById({ name, items: tree.items, _id: tree._id }, itemId);
+      if (location) {
+        break;
       }
-    });
+    }
 
-    if (location.length === 0) {
+    if (!location) {
       throw new Error("Item not found");
     }
 
-    const path = makePath(dashboardName!, location);
-
-    res.status(200).json({ path });
+    res.status(200).json({ path: makePath(location) });
   } catch (error: any) {
     res.status(400).json({ msg: error.message });
   }
