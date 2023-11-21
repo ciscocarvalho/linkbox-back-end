@@ -7,6 +7,7 @@ import authRoute from "./AuthRoute";
 import pathRoute from "./pathRoute";
 import moveRoute from "./moveRoute";
 import repositionRoute from "./repositionRoute";
+import urlTitleRoute from "./urlTitleRoute";
 
 const router = Router();
 
@@ -18,5 +19,6 @@ router.use("/links", linkRoute);
 router.use("/path", pathRoute);
 router.use("/move", moveRoute);
 router.use("/reposition", repositionRoute);
+router.use("/urlTitle", urlTitleRoute);
 
 export default router;
