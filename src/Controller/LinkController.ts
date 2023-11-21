@@ -17,7 +17,23 @@ const getData = async (user: IUser, dashboardName: string, folderLocation: Locat
     return { dashboard, dashboardIndex, folder };
 }
 
+const isTitleValid = (title: string) => {
+  return title.trim() !== "";
+}
+
+const isUrlValid = (url: string) => {
+  return url.trim() !== "";
+}
+
 const add = async (user: IUser, dashboardName: string, linkData: ILink, path: Path) => {
+    if (!isUrlValid(linkData.url)) {
+      throw new Error("Invalid link url");
+    }
+
+    if (!isTitleValid(linkData.title)) {
+      throw new Error("Invalid link title");
+    }
+
     const folderLocation = getLocationFromPath(path);
 
     const {

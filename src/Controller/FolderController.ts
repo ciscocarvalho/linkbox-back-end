@@ -102,8 +102,17 @@ const addIdsToFolderAndItems = (folder: IFolder) => {
   return folder;
 }
 
+const isFolderNameValid = (name: string) => {
+  name = name.trim();
+  return name && name.indexOf("/") === -1;
+}
+
 class FolderController {
   static async create(userId: string, dashboardName: string, folderData: IFolder, path: string) {
+    if (!isFolderNameValid(folderData.name)) {
+      throw new Error("Invalid folder name");
+    }
+
     const user = await getUserOrThrowError(userId);
     folderData = addIdsToFolderAndItems(folderData);
     await add(user, dashboardName, folderData, path);
