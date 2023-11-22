@@ -1,4 +1,4 @@
-import { IFolder, IItem } from "../../Model/User";
+import { IDashboard, IFolder, IItem } from "../../Model/User";
 import { isFolder } from "../../util/util";
 
 type Location = string[];
@@ -6,6 +6,14 @@ type Location = string[];
 const checkItemId = (item: IItem, id: string) => {
   return item._id.toString() === id;
 };
+
+const getItemLabel = (item: IItem) =>  {
+  if (isFolder(item)) {
+    return item.name;
+  }
+
+  return encodeURIComponent(item.url);
+}
 
 const searchItemWithLocation = (root: IFolder, predicate: (item: IItem) => boolean) => {
   const location: Location = [root.name];
@@ -16,8 +24,8 @@ const searchItemWithLocation = (root: IFolder, predicate: (item: IItem) => boole
 
   const search = ({ items }: IFolder) => {
     for (let item of items) {
-      const item_label = isFolder(item) ? item.name : item.url;
-      location.push(item_label);
+      const itemLabel = getItemLabel(item);
+      location.push(itemLabel);
 
       if (predicate(item)) {
         return item;
@@ -42,15 +50,30 @@ const makePath = (location: Location) => {
   return location.join("/");
 };
 
-export const getItemWithPath = (root: IFolder, id: string) => {
+export const getItemWithPath = (rootOrDashboard: IFolder | IDashboard, id: string) => {
+  let root;
+
+  if ("tree" in rootOrDashboard) {
+    root = {
+      name: "",
+      items: rootOrDashboard.tree.items,
+      _id: rootOrDashboard.tree._id,
+    }
+  } else {
+    root = rootOrDashboard;
+  }
+
   const itemWithLocation = searchItemWithLocation(root, (item: IItem) => checkItemId(item, id));
 
   if (!itemWithLocation) {
     return null;
   }
 
-  return {
-    item: itemWithLocation.item,
-    path: makePath(itemWithLocation.location),
+  let path = makePath(itemWithLocation.location);
+
+  if (path.charAt(0) === "/") {
+    path = path.substring(1);
   }
+
+  return { item: itemWithLocation.item, path };
 };
