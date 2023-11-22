@@ -12,14 +12,7 @@ router.get("/:itemId", async (req, res) => {
     const { itemId } = req.params;
     const userId = req.session!.userId!;
     const user = await getUserOrThrowError(userId);
-    let itemWithPath = null;
-
-    for (let { name, tree } of user.dashboards) {
-      itemWithPath = getItemWithPath({ name, items: tree.items, _id: tree._id }, itemId);
-      if (itemWithPath) {
-        break;
-      }
-    }
+    const itemWithPath = getItemWithPath(user, itemId);
 
     if (!itemWithPath) {
       throw new Error("Item not found");

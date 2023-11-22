@@ -18,7 +18,7 @@ const getFolderDataFromRequest = async (req: Request) => {
   let path;
 
   if (id) {
-    const itemWithPath = getItemWithPath(dashboard, id);
+    const itemWithPath = getItemWithPath(user, id);
 
     if (!itemWithPath) {
       throw new Error("Folder not found");

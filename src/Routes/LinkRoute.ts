@@ -15,7 +15,7 @@ const getLinkDataFromRequest = async (req: Request) => {
   const user = await getUserOrThrowError(userId);
   const { dashboardName, id } = req.params;
   const dashboard = await DashboardController.getByName(dashboardName, user);
-  const itemWithPath = getItemWithPath(dashboard, id);
+  const itemWithPath = getItemWithPath(user, id);
 
   if (!itemWithPath) {
     throw new Error("Link not found");

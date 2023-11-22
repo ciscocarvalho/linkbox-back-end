@@ -1,4 +1,4 @@
-import { IDashboard, IFolder, IItem } from "../../Model/User";
+import { IFolder, IItem, IUser } from "../../Model/User";
 import { isFolder } from "../../util/util";
 
 type Location = string[];
@@ -50,30 +50,23 @@ const makePath = (location: Location) => {
   return location.join("/");
 };
 
-export const getItemWithPath = (rootOrDashboard: IFolder | IDashboard, id: string) => {
-  let root;
-
-  if ("tree" in rootOrDashboard) {
-    root = {
+export const getItemWithPath = (user: IUser, id: string) => {
+  for (let dashboard of user.dashboards) {
+    let root = {
       name: "",
-      items: rootOrDashboard.tree.items,
-      _id: rootOrDashboard.tree._id,
+      items: dashboard.tree.items,
+      _id: dashboard.tree._id,
     }
-  } else {
-    root = rootOrDashboard;
+
+    const itemWithLocation = searchItemWithLocation(root, (item: IItem) => checkItemId(item, id));
+
+    if (!itemWithLocation) {
+      continue;
+    }
+
+    const path = makePath(itemWithLocation.location).substring(1);
+    return { item: itemWithLocation.item, path };
   }
 
-  const itemWithLocation = searchItemWithLocation(root, (item: IItem) => checkItemId(item, id));
-
-  if (!itemWithLocation) {
-    return null;
-  }
-
-  let path = makePath(itemWithLocation.location);
-
-  if (path.charAt(0) === "/") {
-    path = path.substring(1);
-  }
-
-  return { item: itemWithLocation.item, path };
+  return null;
 };
