@@ -2,6 +2,7 @@ import DashboardController from "../Controller/DashboardController";
 import { Router } from "express";
 import isAuthenticated from "../Middlewares/isAuthenticated";
 import { IDashboard } from "../Model/User";
+import { getUserOrThrowError } from "../util/controller";
 
 const router = Router();
 
@@ -11,7 +12,8 @@ router.post("/", async (req, res) => {
   try {
     const userId = req.session!.userId!;
     const dashboard: IDashboard = { ...req.body };
-    const dashboardSaved = await DashboardController.create(userId, dashboard);
+    const user = await getUserOrThrowError(userId);
+    const dashboardSaved = await DashboardController.create(user, dashboard);
     res.status(200).json(dashboardSaved);
   } catch (error: any) {
     res.status(400).json({ msg: error.message });
@@ -21,7 +23,8 @@ router.post("/", async (req, res) => {
 router.get("/", async (req, res) => {
   try {
     const userId = req.session!.userId!;
-    const dashboards = await DashboardController.getAll(userId);
+    const user = await getUserOrThrowError(userId);
+    const dashboards = await DashboardController.getAll(user);
     res.status(200).json({ dashboards });
   } catch (error: any) {
     res.json({ msg: error.message });
@@ -32,7 +35,8 @@ router.get("/:dashboardName", async (req, res) => {
   try {
     const userId = req.session!.userId!;
     const { dashboardName } = req.params;
-    const dashboard = await DashboardController.getByName(dashboardName, userId);
+    const user = await getUserOrThrowError(userId);
+    const dashboard = await DashboardController.getByName(dashboardName, user);
     res.status(200).json(dashboard);
   } catch (error: any) {
     res.status(400).json({ msg: error });
@@ -44,7 +48,8 @@ router.put("/:dashboardName", async (req, res) => {
     const { dashboardName } = req.params;
     const userId = req.session!.userId!;
     const updatedDashboardData = { ...req.body };
-    const d = await DashboardController.update(dashboardName, userId, updatedDashboardData);
+    const user = await getUserOrThrowError(userId);
+    const d = await DashboardController.update(dashboardName, user, updatedDashboardData);
     res.status(200).json(d);
   } catch (error: any) {
     res.status(400).json({ msg: error.message });
@@ -55,7 +60,8 @@ router.delete("/:dashboardName", async (req, res) => {
   try {
     const { dashboardName } = req.params;
     const userId = req.session!.userId!;
-    const u = await DashboardController.delete(dashboardName, userId);
+    const user = await getUserOrThrowError(userId);
+    const u = await DashboardController.delete(dashboardName, user);
     res.status(200).json(u);
   } catch (error: any) {
     res.status(400).json({ msg: error.message });

@@ -3,6 +3,7 @@ import LinkController from "../Controller/LinkController";
 import isAuthenticated from "../Middlewares/isAuthenticated";
 import { ILink } from "../Model/User";
 import { LinkRequest, getLinkDataFromRequest } from "./util/link";
+import { getUserOrThrowError } from "../util/controller";
 
 const router = Router();
 
@@ -12,7 +13,8 @@ router.post(["/:dashboardName", "/:dashboardName/*"], async (req: LinkRequest, r
   try {
     const { userId, dashboardName, path } = getLinkDataFromRequest(req);
     const linkData: ILink = { ...req.body };
-    const l = await LinkController.create(userId, dashboardName, linkData, path);
+    const user = await getUserOrThrowError(userId);
+    const l = await LinkController.create(user, dashboardName, linkData, path);
     res.status(200).json(l);
   } catch (error: any) {
     res.status(400).json({ msg: error.message });
@@ -22,7 +24,8 @@ router.post(["/:dashboardName", "/:dashboardName/*"], async (req: LinkRequest, r
 router.get(["/:dashboardName", "/:dashboardName/*"], async (req: LinkRequest, res) => {
   try {
     const { userId, dashboardName, path } = getLinkDataFromRequest(req);
-    const l = await LinkController.getByPath(userId, dashboardName, path);
+    const user = await getUserOrThrowError(userId);
+    const l = await LinkController.getByPath(user, dashboardName, path);
     res.status(200).json(l);
   } catch (error: any) {
     res.status(400).json({ msg: error.message });
@@ -33,7 +36,8 @@ router.put(["/:dashboardName", "/:dashboardName/*"], async (req: LinkRequest, re
   try {
     const { userId, dashboardName, path } = getLinkDataFromRequest(req);
     const updatedLinkData = { ...req.body };
-    const l = await LinkController.update(userId, dashboardName, path, updatedLinkData);
+    const user = await getUserOrThrowError(userId);
+    const l = await LinkController.update(user, dashboardName, path, updatedLinkData);
     res.status(200).json(l);
   } catch (error: any) {
     res.status(200).json({ msg: error.message });
@@ -43,7 +47,8 @@ router.put(["/:dashboardName", "/:dashboardName/*"], async (req: LinkRequest, re
 router.delete(["/:dashboardName", "/:dashboardName/*"], async (req: LinkRequest, res) => {
   try {
     const { userId, dashboardName, path } = getLinkDataFromRequest(req);
-    const l = await LinkController.delete(userId, dashboardName, path);
+    const user = await getUserOrThrowError(userId);
+    const l = await LinkController.delete(user, dashboardName, path);
     res.status(200).json(l);
   } catch (error: any) {
     res.status(400).json({ msg: error.message });

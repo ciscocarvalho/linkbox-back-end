@@ -1,6 +1,6 @@
 import { ObjectId } from "mongodb";
 import { AnyFolder, IFolder, IUser } from "../Model/User";
-import { getDashboardOrThrowError, getFolderOrThrowError, getUserOrThrowError } from "../util/controller";
+import { getDashboardOrThrowError, getFolderOrThrowError } from "../util/controller";
 import { getLocationFromPath, getParentFolderFromPath, getParentLocation, isFolder } from "../util/util";
 
 const folderNameIsAlreadyUsed = (parent: AnyFolder, name: string) => {
@@ -108,28 +108,25 @@ const isFolderNameValid = (name: string) => {
 }
 
 class FolderController {
-  static async create(userId: string, dashboardName: string, folderData: IFolder, path: string) {
+  static async create(user: IUser, dashboardName: string, folderData: IFolder, path: string) {
     if (!isFolderNameValid(folderData.name)) {
       throw new Error("Invalid folder name");
     }
 
-    const user = await getUserOrThrowError(userId);
     folderData = addIdsToFolderAndItems(folderData);
     await add(user, dashboardName, folderData, path);
     await user.save();
     return folderData;
   }
 
-  static async getByPath(userId: string, dashboardName: string, path: string) {
-    const user = await getUserOrThrowError(userId);
+  static async getByPath(user: IUser, dashboardName: string, path: string) {
     const { dashboard } = getDashboardOrThrowError(user, dashboardName);
     const location = getLocationFromPath(path);
     const folder = getFolderOrThrowError(dashboard, location).folder;
     return folder;
   }
 
-  static async update(userId: string, dashboardName: string, path: string, updatedFolderData: Partial<IFolder>) {
-    const user = await getUserOrThrowError(userId);
+  static async update(user: IUser, dashboardName: string, path: string, updatedFolderData: Partial<IFolder>) {
     const { dashboard, dashboardIndex } = getDashboardOrThrowError(user, dashboardName);
     const location = getLocationFromPath(path);
     const parentLocation = getParentLocation(location);
@@ -156,15 +153,13 @@ class FolderController {
     return folder;
   }
 
-  static async delete(userId: string, dashboardName: string, path: string) {
-    const user = await getUserOrThrowError(userId);
+  static async delete(user: IUser, dashboardName: string, path: string) {
     const folder = await remove(user, dashboardName, path);
     await user.save();
     return folder;
   }
 
-  static async move(userId: string, dashboardName: string, path: string, targetPath: string) {
-    const user = await getUserOrThrowError(userId);
+  static async move(user: IUser, dashboardName: string, path: string, targetPath: string) {
     const folder = await remove(user, dashboardName, path) as IFolder;
     await add(user, dashboardName, folder, targetPath);
     await user.save();
@@ -172,14 +167,13 @@ class FolderController {
   }
 
   static async reposition(
-    userId: string,
+    user: IUser,
     dashboardName: string,
     path: string,
     currentIndex: number,
     newIndex: number,
     strategy?: "before" | "after",
   ) {
-    const user = await getUserOrThrowError(userId);
     const { dashboard, dashboardIndex } = getDashboardOrThrowError(user, dashboardName);
 
     const location = getLocationFromPath(path);

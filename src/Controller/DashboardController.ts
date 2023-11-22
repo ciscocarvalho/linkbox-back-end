@@ -1,10 +1,9 @@
 import { ObjectId } from "mongodb";
-import User, { IDashboard } from "../Model/User";
-import { getDashboardOrThrowError, getUserOrThrowError } from "../util/controller";
+import User, { IDashboard, IUser } from "../Model/User";
+import { getDashboardOrThrowError } from "../util/controller";
 
 class DashboardController {
-  static async create(userId: string, dashboard: IDashboard) {
-    const user = await getUserOrThrowError(userId);
+  static async create(user: IUser, dashboard: IDashboard) {
     const { dashboards } = user;
     const dashboardNameTaken = !!dashboards.find((thisDashboard) => thisDashboard.name === dashboard.name);
 
@@ -20,22 +19,19 @@ class DashboardController {
     return user;
   }
 
-  static async getAll(userId: string) {
-    const user = await getUserOrThrowError(userId);
+  static async getAll(user: IUser) {
     const dashboards = user.dashboards;
 
     return dashboards;
   }
 
-  static async getByName(dashboardName: string, userId: string) {
-    const user = await getUserOrThrowError(userId);
+  static async getByName(dashboardName: string, user: IUser) {
     const { dashboard } = getDashboardOrThrowError(user, dashboardName);
 
     return dashboard;
   }
 
-  static async update(dashboardName: string, userId: string, updatedDashboardData: Partial<IDashboard>) {
-    const user = await getUserOrThrowError(userId);
+  static async update(dashboardName: string, user: IUser, updatedDashboardData: Partial<IDashboard>) {
     const { dashboards } = user;
     const dashboardIndex = user.dashboards.findIndex((d) => d.name === dashboardName);
     const dashboard = dashboards[dashboardIndex];
@@ -50,11 +46,9 @@ class DashboardController {
     return dashboard;
   }
 
-  static async delete(dashboardName: string, userId: string) {
-    await getUserOrThrowError(userId);
-
+  static async delete(dashboardName: string, user: IUser) {
     const updatedUser = await User.findOneAndUpdate(
-      { _id: userId },
+      { _id: user._id },
       {
         $pull: { dashboards: { name: dashboardName } },
       },

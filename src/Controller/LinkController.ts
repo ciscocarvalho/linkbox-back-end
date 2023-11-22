@@ -1,6 +1,6 @@
 import { ObjectId } from "mongodb";
 import { AnyFolder, ILink, IUser } from "../Model/User";
-import { getDashboardOrThrowError, getFolderOrThrowError, getLinkOrThrowError, getLinkUrlFromLocation, getUserOrThrowError } from "../util/controller";
+import { getDashboardOrThrowError, getFolderOrThrowError, getLinkOrThrowError, getLinkUrlFromLocation } from "../util/controller";
 import { getLocationFromPath, getParentLocation, isLink, removeIndexFromArray } from "../util/util";
 
 type Location = string[];
@@ -77,26 +77,23 @@ const remove = async (user: IUser, dashboardName: string, path: Path) => {
 }
 
 class LinkController {
-  static async create(userId: string, dashboardName: string, linkData: ILink, path: Path) {
+  static async create(user: IUser, dashboardName: string, linkData: ILink, path: Path) {
     linkData._id = new ObjectId().toString();
-    const user = await getUserOrThrowError(userId);
     add(user, dashboardName, linkData, path);
     await user.save();
     return linkData;
   }
 
-  static async getByPath(userId: string, dashboardName: string, path: string) {
-    const user = await getUserOrThrowError(userId);
+  static async getByPath(user: IUser, dashboardName: string, path: string) {
     const { dashboard } = getDashboardOrThrowError(user, dashboardName);
     const location = getLocationFromPath(path);
     const link = getLinkOrThrowError(dashboard, location);
     return link;
   }
 
-  static async update(userId: string, dashboardName: string, path: Path, updatedLinkData: Partial<ILink>) {
+  static async update(user: IUser, dashboardName: string, path: Path, updatedLinkData: Partial<ILink>) {
     const linkLocation = getLocationFromPath(path);
     const parentLocation = linkLocation.slice(0, linkLocation.length - 1);
-    const user = await getUserOrThrowError(userId);
 
     const {
       dashboard,
@@ -121,15 +118,13 @@ class LinkController {
     return link;
   }
 
-  static async delete(userId: string, dashboardName: string, path: Path) {
-    const user = await getUserOrThrowError(userId);
+  static async delete(user: IUser, dashboardName: string, path: Path) {
     const link = await remove(user, dashboardName, path);
     await user.save();
     return link;
   }
 
-  static async move(userId: string, dashboardName: string, path: Path, targetPath: Path) {
-    const user = await getUserOrThrowError(userId);
+  static async move(user: IUser, dashboardName: string, path: Path, targetPath: Path) {
     const link = await remove(user, dashboardName, path) as ILink;
     await add(user, dashboardName, link, targetPath);
   }

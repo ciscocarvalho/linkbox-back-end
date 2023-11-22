@@ -3,6 +3,7 @@ import FolderController from "../Controller/FolderController";
 import isAuthenticated from "../Middlewares/isAuthenticated";
 import { IFolder } from "../Model/User";
 import { FolderRequest, getFolderDataFromRequest } from "./util/folder";
+import { getUserOrThrowError } from "../util/controller";
 
 const router = Router();
 
@@ -12,7 +13,8 @@ router.post(["/:dashboardName", "/:dashboardName/*"], async (req: FolderRequest,
   try {
     const { userId, dashboardName, path } = getFolderDataFromRequest(req);
     const clone: IFolder = { ...req.body };
-    const f = await FolderController.create(userId, dashboardName, clone, path ?? "");
+    const user = await getUserOrThrowError(userId);
+    const f = await FolderController.create(user, dashboardName, clone, path ?? "");
     res.status(200).json(f);
   } catch (error: any) {
     res.status(400).json({ msg: error.message });
@@ -22,7 +24,8 @@ router.post(["/:dashboardName", "/:dashboardName/*"], async (req: FolderRequest,
 router.get(["/:dashboardName", "/:dashboardName/*"], async (req: FolderRequest, res) => {
   try {
     const { userId, dashboardName, path } = getFolderDataFromRequest(req);
-    const f = await FolderController.getByPath(userId, dashboardName, path ?? "");
+    const user = await getUserOrThrowError(userId);
+    const f = await FolderController.getByPath(user, dashboardName, path ?? "");
     res.status(200).json(f);
   } catch (error: any) {
     res.status(400).json({ msg: error.message });
@@ -33,7 +36,8 @@ router.put(["/:dashboardName", "/:dashboardName/*"], async (req: FolderRequest, 
   try {
     const { userId, dashboardName, path } = getFolderDataFromRequest(req);
     const updatedFolderData = { ...req.body };
-    const f = await FolderController.update(userId, dashboardName, path ?? "", updatedFolderData);
+    const user = await getUserOrThrowError(userId);
+    const f = await FolderController.update(user, dashboardName, path ?? "", updatedFolderData);
     res.status(200).json(f);
   } catch (error: any) {
     res.status(400).json({ msg: error.message });
@@ -43,7 +47,8 @@ router.put(["/:dashboardName", "/:dashboardName/*"], async (req: FolderRequest, 
 router.delete(["/:dashboardName", "/:dashboardName/*"], async (req: FolderRequest, res) => {
   try {
     const { userId, dashboardName, path } = getFolderDataFromRequest(req);
-    const f = await FolderController.delete(userId, dashboardName, path ?? "");
+    const user = await getUserOrThrowError(userId);
+    const f = await FolderController.delete(user, dashboardName, path ?? "");
     res.status(200).json(f);
   } catch (error: any) {
     res.status(400).json({ msg: error.message });
