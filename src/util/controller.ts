@@ -70,3 +70,7 @@ export const getLinkOrThrowError = (dashboard: IDashboard, location: Location) =
 
   return { link, linkIndex };
 }
+
+export const getDashboardIndex = (user: IUser, dashboard: IDashboard) => {
+  return user.dashboards.findIndex((d) => d === dashboard);
+}

@@ -1,15 +1,14 @@
 import { ObjectId } from "mongodb";
-import { AnyFolder, IFolder, IUser } from "../Model/User";
-import { getDashboardOrThrowError, getFolderOrThrowError } from "../util/controller";
+import { AnyFolder, IDashboard, IFolder, IUser } from "../Model/User";
+import { getDashboardIndex, getFolderOrThrowError } from "../util/controller";
 import { getLocationFromPath, getParentFolderFromPath, getParentLocation, isFolder } from "../util/util";
 
 const folderNameIsAlreadyUsed = (parent: AnyFolder, name: string) => {
   return !!parent.items.find((item) => isFolder(item) && item.name === name);
 }
 
-const add = async (user: IUser, dashboardName: string, folderData: IFolder, path: string) => {
-  const { dashboard, dashboardIndex } = getDashboardOrThrowError(user, dashboardName);
-
+const add = async (user: IUser, dashboard: IDashboard, folderData: IFolder, path: string) => {
+  const dashboardIndex = getDashboardIndex(user, dashboard);
   const location = getLocationFromPath(path);
   const destinationFolder = getFolderOrThrowError(dashboard, location).folder;
 
@@ -26,9 +25,8 @@ const add = async (user: IUser, dashboardName: string, folderData: IFolder, path
   user.dashboards[dashboardIndex] = dashboard;
 }
 
-const remove = async (user: IUser, dashboardName: string, path: string) => {
-  const { dashboard, dashboardIndex } = getDashboardOrThrowError(user, dashboardName);
-
+const remove = async (user: IUser, dashboard: IDashboard, path: string) => {
+  const dashboardIndex = getDashboardIndex(user, dashboard);
   const root = dashboard.tree;
   const parentFolder = getParentFolderFromPath(path, root)
 
@@ -108,26 +106,25 @@ const isFolderNameValid = (name: string) => {
 }
 
 class FolderController {
-  static async create(user: IUser, dashboardName: string, folderData: IFolder, path: string) {
+  static async create(user: IUser, dashboard: IDashboard, folderData: IFolder, path: string) {
     if (!isFolderNameValid(folderData.name)) {
       throw new Error("Invalid folder name");
     }
 
     folderData = addIdsToFolderAndItems(folderData);
-    await add(user, dashboardName, folderData, path);
+    await add(user, dashboard, folderData, path);
     await user.save();
     return folderData;
   }
 
-  static async getByPath(user: IUser, dashboardName: string, path: string) {
-    const { dashboard } = getDashboardOrThrowError(user, dashboardName);
+  static async getByPath(dashboard: IDashboard, path: string) {
     const location = getLocationFromPath(path);
     const folder = getFolderOrThrowError(dashboard, location).folder;
     return folder;
   }
 
-  static async update(user: IUser, dashboardName: string, path: string, updatedFolderData: Partial<IFolder>) {
-    const { dashboard, dashboardIndex } = getDashboardOrThrowError(user, dashboardName);
+  static async update(user: IUser, dashboard: IDashboard, path: string, updatedFolderData: Partial<IFolder>) {
+    const dashboardIndex = getDashboardIndex(user, dashboard);
     const location = getLocationFromPath(path);
     const parentLocation = getParentLocation(location);
     const parentFolder = getFolderOrThrowError(dashboard, parentLocation).folder;
@@ -153,29 +150,28 @@ class FolderController {
     return folder;
   }
 
-  static async delete(user: IUser, dashboardName: string, path: string) {
-    const folder = await remove(user, dashboardName, path);
+  static async delete(user: IUser, dashboard: IDashboard, path: string) {
+    const folder = await remove(user, dashboard, path);
     await user.save();
     return folder;
   }
 
-  static async move(user: IUser, dashboardName: string, path: string, targetPath: string) {
-    const folder = await remove(user, dashboardName, path) as IFolder;
-    await add(user, dashboardName, folder, targetPath);
+  static async move(user: IUser, dashboard: IDashboard, path: string, targetPath: string) {
+    const folder = await remove(user, dashboard, path) as IFolder;
+    await add(user, dashboard, folder, targetPath);
     await user.save();
     return folder;
   }
 
   static async reposition(
     user: IUser,
-    dashboardName: string,
+    dashboard: IDashboard,
     path: string,
     currentIndex: number,
     newIndex: number,
     strategy?: "before" | "after",
   ) {
-    const { dashboard, dashboardIndex } = getDashboardOrThrowError(user, dashboardName);
-
+    const dashboardIndex = getDashboardIndex(user, dashboard);
     const location = getLocationFromPath(path);
     const folder = getFolderOrThrowError(dashboard, location).folder;
 

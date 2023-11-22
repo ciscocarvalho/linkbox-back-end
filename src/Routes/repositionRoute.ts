@@ -3,6 +3,7 @@ import isAuthenticated from "../Middlewares/isAuthenticated";
 import FolderController from "../Controller/FolderController";
 import { FolderRequest, getFolderDataFromRequest } from "./util/folder";
 import { getUserOrThrowError } from "../util/controller";
+import DashboardController from "../Controller/DashboardController";
 
 const router = Router();
 
@@ -21,7 +22,8 @@ router.post(["/:dashboardName", "/:dashboardName/*"], async (req: FolderRequest,
       strategy?: "before" | "after",
     } = req.body;
     const user = await getUserOrThrowError(userId);
-    const f = await FolderController.reposition(user, dashboardName, path ?? "", currentIndex, newIndex, strategy);
+    const dashboard = await DashboardController.getByName(dashboardName, user);
+    const f = await FolderController.reposition(user, dashboard, path ?? "", currentIndex, newIndex, strategy);
     res.status(200).json(f);
   } catch (error: any) {
     res.status(404).json({ msg: error.message });

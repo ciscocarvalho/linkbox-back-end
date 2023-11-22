@@ -5,6 +5,7 @@ import FolderController from "../Controller/FolderController";
 import { LinkRequest, getLinkDataFromRequest } from "./util/link";
 import { FolderRequest, getFolderDataFromRequest } from "./util/folder";
 import { getUserOrThrowError } from "../util/controller";
+import DashboardController from "../Controller/DashboardController";
 
 const router = Router();
 
@@ -16,7 +17,8 @@ router.post("/folder/:dashboardName/*", async (req: FolderRequest, res) => {
     let { targetPath } = req.body;
     targetPath = targetPath.split("/").slice(1).join("/");
     const user = await getUserOrThrowError(userId);
-    const f = await FolderController.move(user, dashboardName, path!, targetPath);
+    const dashboard = await DashboardController.getByName(dashboardName, user);
+    const f = await FolderController.move(user, dashboard, path!, targetPath);
     res.status(200).json(f);
   } catch (error: any) {
     res.status(404).json({ msg: error.message });
@@ -29,7 +31,8 @@ router.post("/link/:dashboardName/*", async (req: LinkRequest, res) => {
     let { targetPath } = req.body;
     targetPath = targetPath.split("/").slice(1).join("/");
     const user = await getUserOrThrowError(userId);
-    const l = await LinkController.move(user, dashboardName, path, targetPath);
+    const dashboard = await DashboardController.getByName(dashboardName, user);
+    const l = await LinkController.move(user, dashboard, path, targetPath);
     res.status(200).json(l);
   } catch (error: any) {
     res.status(404).json({ msg: error.message });

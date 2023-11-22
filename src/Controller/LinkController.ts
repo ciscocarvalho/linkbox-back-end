@@ -1,6 +1,6 @@
 import { ObjectId } from "mongodb";
-import { AnyFolder, ILink, IUser } from "../Model/User";
-import { getDashboardOrThrowError, getFolderOrThrowError, getLinkOrThrowError, getLinkUrlFromLocation } from "../util/controller";
+import { AnyFolder, IDashboard, ILink, IUser } from "../Model/User";
+import { getDashboardIndex, getFolderOrThrowError, getLinkOrThrowError, getLinkUrlFromLocation } from "../util/controller";
 import { getLocationFromPath, getParentLocation, isLink, removeIndexFromArray } from "../util/util";
 
 type Location = string[];
@@ -10,9 +10,9 @@ const linkUrlIsAlreadyUsed = (parent: AnyFolder, url: string) => {
   return !!parent.items.find((item) => isLink(item) && item.url === url);
 }
 
-const getData = async (user: IUser, dashboardName: string, folderLocation: Location) => {
-    const { dashboard, dashboardIndex } = getDashboardOrThrowError(user, dashboardName);
+const getData = async (user: IUser, dashboard: IDashboard, folderLocation: Location) => {
     const folder = getFolderOrThrowError(dashboard, folderLocation).folder;
+    const dashboardIndex = getDashboardIndex(user, dashboard);
 
     return { dashboard, dashboardIndex, folder };
 }
@@ -25,7 +25,7 @@ const isUrlValid = (url: string) => {
   return url.trim() !== "";
 }
 
-const add = async (user: IUser, dashboardName: string, linkData: ILink, path: Path) => {
+const add = async (user: IUser, dashboard: IDashboard, linkData: ILink, path: Path) => {
     if (!isUrlValid(linkData.url)) {
       throw new Error("Invalid link url");
     }
@@ -37,10 +37,9 @@ const add = async (user: IUser, dashboardName: string, linkData: ILink, path: Pa
     const folderLocation = getLocationFromPath(path);
 
     const {
-      dashboard,
       dashboardIndex,
       folder: destinationFolder,
-    } = await getData(user, dashboardName, folderLocation);
+    } = await getData(user, dashboard, folderLocation);
 
     if (linkUrlIsAlreadyUsed(destinationFolder, linkData.url)) {
       throw new Error("Link url already used");
@@ -50,7 +49,7 @@ const add = async (user: IUser, dashboardName: string, linkData: ILink, path: Pa
     user.dashboards[dashboardIndex] = dashboard;
 }
 
-const remove = async (user: IUser, dashboardName: string, path: Path) => {
+const remove = async (user: IUser, dashboard: IDashboard, path: Path) => {
   const linkLocation = getLocationFromPath(path);
   const linkUrl = getLinkUrlFromLocation(linkLocation);
 
@@ -63,10 +62,9 @@ const remove = async (user: IUser, dashboardName: string, path: Path) => {
   const parentLocation = getParentLocation(linkLocation);
 
   const {
-    dashboard,
     dashboardIndex,
     folder: parentFolder,
-  } = await getData(user, dashboardName, parentLocation);
+  } = await getData(user, dashboard, parentLocation);
 
   const { link, linkIndex } = getLinkOrThrowError(dashboard, linkLocation);
 
@@ -77,29 +75,27 @@ const remove = async (user: IUser, dashboardName: string, path: Path) => {
 }
 
 class LinkController {
-  static async create(user: IUser, dashboardName: string, linkData: ILink, path: Path) {
+  static async create(user: IUser, dashboard: IDashboard, linkData: ILink, path: Path) {
     linkData._id = new ObjectId().toString();
-    add(user, dashboardName, linkData, path);
+    add(user, dashboard, linkData, path);
     await user.save();
     return linkData;
   }
 
-  static async getByPath(user: IUser, dashboardName: string, path: string) {
-    const { dashboard } = getDashboardOrThrowError(user, dashboardName);
+  static async getByPath(dashboard: IDashboard, path: string) {
     const location = getLocationFromPath(path);
     const link = getLinkOrThrowError(dashboard, location);
     return link;
   }
 
-  static async update(user: IUser, dashboardName: string, path: Path, updatedLinkData: Partial<ILink>) {
+  static async update(user: IUser, dashboard: IDashboard, path: Path, updatedLinkData: Partial<ILink>) {
     const linkLocation = getLocationFromPath(path);
     const parentLocation = linkLocation.slice(0, linkLocation.length - 1);
 
     const {
-      dashboard,
       dashboardIndex,
       folder: parentFolder,
-    } = await getData(user, dashboardName, parentLocation);
+    } = await getData(user, dashboard, parentLocation);
 
     const { link, linkIndex } = getLinkOrThrowError(dashboard, linkLocation);
 
@@ -118,15 +114,15 @@ class LinkController {
     return link;
   }
 
-  static async delete(user: IUser, dashboardName: string, path: Path) {
-    const link = await remove(user, dashboardName, path);
+  static async delete(user: IUser, dashboard: IDashboard, path: Path) {
+    const link = await remove(user, dashboard, path);
     await user.save();
     return link;
   }
 
-  static async move(user: IUser, dashboardName: string, path: Path, targetPath: Path) {
-    const link = await remove(user, dashboardName, path) as ILink;
-    await add(user, dashboardName, link, targetPath);
+  static async move(user: IUser, dashboard: IDashboard, path: Path, targetPath: Path) {
+    const link = await remove(user, dashboard, path) as ILink;
+    await add(user, dashboard, link, targetPath);
   }
 }
 
