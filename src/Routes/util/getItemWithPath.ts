@@ -12,22 +12,13 @@ const makePath = (location: Location) => {
 };
 
 export const getItemWithPath = (user: IUser, id: string) => {
-  for (let dashboard of user.dashboards) {
-    let root = {
-      name: "",
-      items: dashboard.tree.items,
-      _id: dashboard.tree._id,
-    }
+  const itemWithLocation = findItemAndLocation(user, (item: IItem) => checkItemId(item, id));
 
-    const itemWithLocation = findItemAndLocation(root, (item: IItem) => checkItemId(item, id));
-
-    if (!itemWithLocation) {
-      continue;
-    }
-
-    const path = makePath(itemWithLocation.location).substring(1);
-    return { item: itemWithLocation.item, path };
+  if (!itemWithLocation) {
+    return null;
   }
 
-  return null;
+  itemWithLocation.location = itemWithLocation.location.slice(1);
+  const path = makePath(itemWithLocation.location);
+  return { item: itemWithLocation.item, path };
 };

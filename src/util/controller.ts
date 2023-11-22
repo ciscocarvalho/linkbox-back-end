@@ -111,33 +111,43 @@ const getItemLabel = (item: IItem) =>  {
   return encodeURIComponent(item.url);
 }
 
-export const findItemAndLocation = (root: IFolder, predicate: (item: IItem) => boolean) => {
-  const location: Location = [root.name];
+export const findItemAndLocation = (user: IUser, predicate: (item: IItem) => boolean) => {
+  for (let dashboard of user.dashboards) {
+    let root = {
+      name: dashboard.name,
+      items: dashboard.tree.items,
+      _id: dashboard.tree._id,
+    }
 
-  if (predicate(root)) {
-    return { item: root, location };
+    const location: Location = [root.name];
+
+    if (predicate(root)) {
+      return { item: root, location };
+    }
+
+    const search = ({ items }: IFolder) => {
+      for (let item of items) {
+        const itemLabel = getItemLabel(item);
+        location.push(itemLabel);
+
+        if (predicate(item)) {
+          return item;
+        }
+
+        let found = isFolder(item) ? search(item) : false;
+
+        if (found) {
+          return item;
+        }
+
+        location.pop();
+      }
+    };
+
+    const item = search(root);
+
+    return item ? { item, location } : null;
   }
 
-  const search = ({ items }: IFolder) => {
-    for (let item of items) {
-      const itemLabel = getItemLabel(item);
-      location.push(itemLabel);
-
-      if (predicate(item)) {
-        return item;
-      }
-
-      let found = isFolder(item) ? search(item) : false;
-
-      if (found) {
-        return item;
-      }
-
-      location.pop();
-    }
-  };
-
-  const item = search(root);
-
-  return item ? { item, location } : null;
+  return null;
 };
