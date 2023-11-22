@@ -38,7 +38,7 @@ router.post("/:dashboardName/:id", async (req, res) => {
 router.get("/:dashboardName/:id", async (req, res) => {
   try {
     const { dashboard, path } = await getLinkDataFromRequest(req);
-    const l = await LinkController.getByPath(dashboard, path);
+    const l = LinkController.getByPath(dashboard, path);
     res.status(200).json(l);
   } catch (error: any) {
     res.status(400).json({ msg: error.message });

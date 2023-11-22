@@ -1,5 +1,5 @@
 import User, { AnyFolder, IDashboard, ILink, IUser } from "../Model/User";
-import { getFolderFromLocation, getParentLocation, isLink } from "./util";
+import { getFolderFromLocation, getLocationFromPath, getParentLocation, isLink } from "./util";
 
 type Location = string[];
 
@@ -73,4 +73,32 @@ export const getLinkOrThrowError = (dashboard: IDashboard, location: Location) =
 
 export const getDashboardIndex = (user: IUser, dashboard: IDashboard) => {
   return user.dashboards.findIndex((d) => d === dashboard);
+}
+
+export const getFolderByPath = (dashboard: IDashboard, path: string) => {
+  const location = getLocationFromPath(path);
+  return getFolderOrThrowError(dashboard, location).folder;
+}
+
+export const getLinkByPath = (dashboard: IDashboard, path: string) => {
+  const location = getLocationFromPath(path);
+  return getLinkOrThrowError(dashboard, location).link;
+}
+
+export const getItemByPath = async (user: IUser, path: string) => {
+  const { dashboards } = user;
+
+  for (let dashboard of dashboards) {
+    const folder = getFolderByPath(dashboard, path);
+
+    if (folder) {
+      return folder;
+    }
+
+    const link = getLinkByPath(dashboard, path);
+
+    if (link) {
+      return link;
+    }
+  }
 }

@@ -1,6 +1,6 @@
 import { ObjectId } from "mongodb";
 import { AnyFolder, IDashboard, ILink, IUser } from "../Model/User";
-import { getDashboardIndex, getFolderOrThrowError, getLinkOrThrowError, getLinkUrlFromLocation } from "../util/controller";
+import { getDashboardIndex, getFolderOrThrowError, getLinkByPath, getLinkOrThrowError, getLinkUrlFromLocation } from "../util/controller";
 import { getLocationFromPath, getParentLocation, isLink, removeIndexFromArray } from "../util/util";
 
 type Location = string[];
@@ -82,10 +82,8 @@ class LinkController {
     return linkData;
   }
 
-  static async getByPath(dashboard: IDashboard, path: string) {
-    const location = getLocationFromPath(path);
-    const link = getLinkOrThrowError(dashboard, location);
-    return link;
+  static getByPath(dashboard: IDashboard, path: string) {
+    return getLinkByPath(dashboard, path);
   }
 
   static async update(user: IUser, dashboard: IDashboard, path: Path, updatedLinkData: Partial<ILink>) {

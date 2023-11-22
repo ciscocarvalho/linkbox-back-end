@@ -1,6 +1,6 @@
 import { ObjectId } from "mongodb";
 import { AnyFolder, IDashboard, IFolder, IUser } from "../Model/User";
-import { getDashboardIndex, getFolderOrThrowError } from "../util/controller";
+import { getDashboardIndex, getFolderByPath, getFolderOrThrowError } from "../util/controller";
 import { getLocationFromPath, getParentFolderFromPath, getParentLocation, isFolder } from "../util/util";
 
 const folderNameIsAlreadyUsed = (parent: AnyFolder, name: string) => {
@@ -117,10 +117,8 @@ class FolderController {
     return folderData;
   }
 
-  static async getByPath(dashboard: IDashboard, path: string) {
-    const location = getLocationFromPath(path);
-    const folder = getFolderOrThrowError(dashboard, location).folder;
-    return folder;
+  static getByPath(dashboard: IDashboard, path: string) {
+    return getFolderByPath(dashboard, path);
   }
 
   static async update(user: IUser, dashboard: IDashboard, path: string, updatedFolderData: Partial<IFolder>) {

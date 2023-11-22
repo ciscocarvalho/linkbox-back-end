@@ -46,7 +46,7 @@ router.post("/:dashboardName/:id", async (req, res) => {
 router.get(["/:dashboardName", "/:dashboardName/:id"], async (req, res) => {
   try {
     const { dashboard, path } = await getFolderDataFromRequest(req);
-    const f = await FolderController.getByPath(dashboard, path ?? "");
+    const f = FolderController.getByPath(dashboard, path ?? "");
     res.status(200).json(f);
   } catch (error: any) {
     res.status(400).json({ msg: error.message });
