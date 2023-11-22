@@ -15,7 +15,7 @@ const getItemLabel = (item: IItem) =>  {
   return encodeURIComponent(item.url);
 }
 
-const searchItemWithLocation = (root: IFolder, predicate: (item: IItem) => boolean) => {
+const findItemAndLocation = (root: IFolder, predicate: (item: IItem) => boolean) => {
   const location: Location = [root.name];
 
   if (predicate(root)) {
@@ -58,7 +58,7 @@ export const getItemWithPath = (user: IUser, id: string) => {
       _id: dashboard.tree._id,
     }
 
-    const itemWithLocation = searchItemWithLocation(root, (item: IItem) => checkItemId(item, id));
+    const itemWithLocation = findItemAndLocation(root, (item: IItem) => checkItemId(item, id));
 
     if (!itemWithLocation) {
       continue;
