@@ -1,5 +1,5 @@
-import User, { AnyFolder, IDashboard, ILink, IUser } from "../Model/User";
-import { getFolderFromLocation, getLocationFromPath, getParentLocation, isLink } from "./util";
+import User, { AnyFolder, IDashboard, ILink, IUser, IItem, IFolder } from "../Model/User";
+import { getFolderFromLocation, getLocationFromPath, getParentLocation, isLink, isFolder } from "./util";
 
 type Location = string[];
 
@@ -102,3 +102,42 @@ export const getItemByPath = async (user: IUser, path: string) => {
     }
   }
 }
+
+const getItemLabel = (item: IItem) =>  {
+  if (isFolder(item)) {
+    return item.name;
+  }
+
+  return encodeURIComponent(item.url);
+}
+
+export const findItemAndLocation = (root: IFolder, predicate: (item: IItem) => boolean) => {
+  const location: Location = [root.name];
+
+  if (predicate(root)) {
+    return { item: root, location };
+  }
+
+  const search = ({ items }: IFolder) => {
+    for (let item of items) {
+      const itemLabel = getItemLabel(item);
+      location.push(itemLabel);
+
+      if (predicate(item)) {
+        return item;
+      }
+
+      let found = isFolder(item) ? search(item) : false;
+
+      if (found) {
+        return item;
+      }
+
+      location.pop();
+    }
+  };
+
+  const item = search(root);
+
+  return item ? { item, location } : null;
+};

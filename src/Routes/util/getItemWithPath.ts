@@ -1,49 +1,10 @@
-import { IFolder, IItem, IUser } from "../../Model/User";
-import { isFolder } from "../../util/util";
+import { IItem, IUser } from "../../Model/User";
+import { findItemAndLocation } from "../../util/controller";
 
 type Location = string[];
 
 const checkItemId = (item: IItem, id: string) => {
   return item._id.toString() === id;
-};
-
-const getItemLabel = (item: IItem) =>  {
-  if (isFolder(item)) {
-    return item.name;
-  }
-
-  return encodeURIComponent(item.url);
-}
-
-const findItemAndLocation = (root: IFolder, predicate: (item: IItem) => boolean) => {
-  const location: Location = [root.name];
-
-  if (predicate(root)) {
-    return { item: root, location };
-  }
-
-  const search = ({ items }: IFolder) => {
-    for (let item of items) {
-      const itemLabel = getItemLabel(item);
-      location.push(itemLabel);
-
-      if (predicate(item)) {
-        return item;
-      }
-
-      let found = isFolder(item) ? search(item) : false;
-
-      if (found) {
-        return item;
-      }
-
-      location.pop();
-    }
-  };
-
-  const item = search(root);
-
-  return item ? { item, location } : null;
 };
 
 const makePath = (location: Location) => {
