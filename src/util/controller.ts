@@ -1,5 +1,5 @@
 import User, { AnyFolder, IDashboard, ILink, IUser, IItem, IFolder } from "../Model/User";
-import { getFolderFromLocation, getLocationFromPath, getParentLocation, isLink, isFolder } from "./util";
+import { getFolderFromLocation, getLocationFromPath, getParentLocation, isLink, isFolder, checkItemId } from "./util";
 
 type Location = string[];
 
@@ -24,7 +24,7 @@ export const getDashboardOrThrowError = (user: IUser, dashboardName: string) => 
   return { dashboard, dashboardIndex };
 }
 
-export const getFolderOrThrowError = (dashboard: IDashboard, location?: Location) => {
+const getFolderOrThrowError = (dashboard: IDashboard, location?: Location) => {
   const root = dashboard.tree;
   const folder = location ? getFolderFromLocation(location, root) : root;
 
@@ -37,7 +37,7 @@ export const getFolderOrThrowError = (dashboard: IDashboard, location?: Location
   };
 }
 
-export const getLinkUrlFromLocation = (linkLocation: Location) => {
+const getLinkUrlFromLocation = (linkLocation: Location) => {
   let url = linkLocation[linkLocation.length - 1];
 
   if (!url) {
@@ -47,7 +47,7 @@ export const getLinkUrlFromLocation = (linkLocation: Location) => {
   return decodeURIComponent(url);
 }
 
-export const getLinkOrThrowError = (dashboard: IDashboard, location: Location) => {
+const getLinkOrThrowError = (dashboard: IDashboard, location: Location) => {
   const parentLocation = getParentLocation(location);
   const parentFolder = getFolderOrThrowError(dashboard, parentLocation).folder;
   const url = getLinkUrlFromLocation(location);
@@ -75,31 +75,31 @@ export const getDashboardIndex = (user: IUser, dashboard: IDashboard) => {
   return user.dashboards.findIndex((d) => d === dashboard);
 }
 
-export const getFolderByPath = (dashboard: IDashboard, path: string) => {
-  const location = getLocationFromPath(path);
-  return getFolderOrThrowError(dashboard, location).folder;
+export const getFolderByPath = (user: IUser, path: string) => {
+  for (let dashboard of user.dashboards) {
+    const location = getLocationFromPath(path);
+    return getFolderOrThrowError(dashboard, location).folder;
+  }
 }
 
-export const getLinkByPath = (dashboard: IDashboard, path: string) => {
-  const location = getLocationFromPath(path);
-  return getLinkOrThrowError(dashboard, location).link;
+export const getLinkByPath = (user: IUser, path: string) => {
+  for (let dashboard of user.dashboards) {
+    const location = getLocationFromPath(path);
+    return getLinkOrThrowError(dashboard, location).link;
+  }
 }
 
 export const getItemByPath = async (user: IUser, path: string) => {
-  const { dashboards } = user;
+  const folder = getFolderByPath(user, path);
 
-  for (let dashboard of dashboards) {
-    const folder = getFolderByPath(dashboard, path);
+  if (folder) {
+    return folder;
+  }
 
-    if (folder) {
-      return folder;
-    }
+  const link = getLinkByPath(user, path);
 
-    const link = getLinkByPath(dashboard, path);
-
-    if (link) {
-      return link;
-    }
+  if (link) {
+    return link;
   }
 }
 
@@ -113,7 +113,7 @@ const getItemLabel = (item: IItem) =>  {
 
 export const findItemAndLocation = (user: IUser, predicate: (item: IItem) => boolean) => {
   for (let dashboard of user.dashboards) {
-    let root = {
+    let root: IFolder = {
       name: dashboard.name,
       items: dashboard.tree.items,
       _id: dashboard.tree._id,
@@ -125,7 +125,7 @@ export const findItemAndLocation = (user: IUser, predicate: (item: IItem) => boo
       return { item: root, location };
     }
 
-    const search = ({ items }: IFolder) => {
+    const search = ({ items }: IFolder): IItem | null => {
       for (let item of items) {
         const itemLabel = getItemLabel(item);
         location.push(itemLabel);
@@ -134,20 +134,34 @@ export const findItemAndLocation = (user: IUser, predicate: (item: IItem) => boo
           return item;
         }
 
-        let found = isFolder(item) ? search(item) : false;
+        let found = isFolder(item) ? search(item) : null;
 
         if (found) {
-          return item;
+          return found;
         }
 
         location.pop();
       }
+
+      return null;
     };
 
     const item = search(root);
-
     return item ? { item, location } : null;
   }
 
   return null;
 };
+
+export const getItemParent = (user: IUser, id: string) => {
+  const parentWithLocation = findItemAndLocation(user, (parent) => {
+    if (!isFolder(parent)) {
+      return false;
+    }
+
+    return !!parent.items.find(child => checkItemId(child, id));
+  });
+
+  const parent = parentWithLocation?.item as IFolder | undefined;
+  return parent ?? null;
+}

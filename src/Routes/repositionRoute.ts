@@ -1,17 +1,15 @@
 import { Router } from "express";
 import isAuthenticated from "../Middlewares/isAuthenticated";
 import FolderController from "../Controller/FolderController";
-import { FolderRequest, getFolderDataFromRequest } from "./util/folder";
-import { getUserOrThrowError } from "../util/controller";
-import DashboardController from "../Controller/DashboardController";
+import { getDataForItemRequest } from "./util/getDataFromRequest";
 
 const router = Router();
 
 router.use(isAuthenticated);
 
-router.post(["/:dashboardName", "/:dashboardName/*"], async (req: FolderRequest, res) => {
+router.post("/:dashboardName/:id", async (req, res) => {
   try {
-    const { userId, dashboardName, path } = getFolderDataFromRequest(req);
+    const { user, dashboard, id: parentId } = await getDataForItemRequest(req);
     let {
       currentIndex,
       newIndex,
@@ -21,9 +19,7 @@ router.post(["/:dashboardName", "/:dashboardName/*"], async (req: FolderRequest,
       newIndex: number,
       strategy?: "before" | "after",
     } = req.body;
-    const user = await getUserOrThrowError(userId);
-    const dashboard = await DashboardController.getByName(dashboardName, user);
-    const f = await FolderController.reposition(user, dashboard, path ?? "", currentIndex, newIndex, strategy);
+    const f = await FolderController.reposition(user, dashboard, parentId, currentIndex, newIndex, strategy);
     res.status(200).json(f);
   } catch (error: any) {
     res.status(404).json({ msg: error.message });

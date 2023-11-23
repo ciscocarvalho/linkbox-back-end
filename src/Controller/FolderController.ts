@@ -1,18 +1,29 @@
 import { ObjectId } from "mongodb";
 import { AnyFolder, IDashboard, IFolder, IUser } from "../Model/User";
-import { getDashboardIndex, getFolderByPath, getFolderOrThrowError } from "../util/controller";
-import { getLocationFromPath, getParentFolderFromPath, getParentLocation, isFolder } from "../util/util";
+import { getDashboardIndex, getFolderByPath, getItemParent } from "../util/controller";
+import { isFolder, removeItemInPlace } from "../util/util";
+import { getItemWithPath } from "../Routes/util/getItemWithPath";
+
+const getFolderOrThrowError = (user: IUser, id: string) => {
+  const folderWithPath = getItemWithPath(user, id);
+  const folder = folderWithPath?.item as IFolder | undefined;
+
+  if (!folder) {
+    throw new Error("Folder not found");
+  }
+
+  return folder;
+}
 
 const folderNameIsAlreadyUsed = (parent: AnyFolder, name: string) => {
   return !!parent.items.find((item) => isFolder(item) && item.name === name);
 }
 
-const add = async (user: IUser, dashboard: IDashboard, folderData: IFolder, path: string) => {
+const add = async (user: IUser, dashboard: IDashboard, folderData: IFolder, parentId: string) => {
   const dashboardIndex = getDashboardIndex(user, dashboard);
-  const location = getLocationFromPath(path);
-  const destinationFolder = getFolderOrThrowError(dashboard, location).folder;
+  const parentFolder = getFolderOrThrowError(user, parentId);
 
-  if (folderNameIsAlreadyUsed(destinationFolder, folderData.name)) {
+  if (folderNameIsAlreadyUsed(parentFolder, folderData.name)) {
     throw new Error("Folder name already used");
   }
 
@@ -20,21 +31,18 @@ const add = async (user: IUser, dashboard: IDashboard, folderData: IFolder, path
     folderData.items = [];
   }
 
-  destinationFolder.items.push(folderData);
+  parentFolder.items.push(folderData);
 
   user.dashboards[dashboardIndex] = dashboard;
 }
 
-const remove = async (user: IUser, dashboard: IDashboard, path: string) => {
+const remove = async (user: IUser, dashboard: IDashboard, id: string) => {
   const dashboardIndex = getDashboardIndex(user, dashboard);
-  const root = dashboard.tree;
-  const parentFolder = getParentFolderFromPath(path, root)
-
-  const location = getLocationFromPath(path);
-  const folder = getFolderOrThrowError(dashboard, location).folder;
+  const folder = getFolderOrThrowError(user, id);
+  const parentFolder = getItemParent(user, folder._id);
 
   if (parentFolder) {
-    parentFolder.items = parentFolder.items.filter((item) => item !== folder);
+    removeItemInPlace(parentFolder.items, folder);
   } else {
     dashboard.tree.items = [];
   }
@@ -106,57 +114,54 @@ const isFolderNameValid = (name: string) => {
 }
 
 class FolderController {
-  static async create(user: IUser, dashboard: IDashboard, folderData: IFolder, path: string) {
+  static async create(user: IUser, dashboard: IDashboard, folderData: IFolder, parentId: string) {
     if (!isFolderNameValid(folderData.name)) {
       throw new Error("Invalid folder name");
     }
 
     folderData = addIdsToFolderAndItems(folderData);
-    await add(user, dashboard, folderData, path);
+    await add(user, dashboard, folderData, parentId);
     await user.save();
     return folderData;
   }
 
-  static getByPath(dashboard: IDashboard, path: string) {
-    return getFolderByPath(dashboard, path);
+  static getByPath(user: IUser, path: string) {
+    return getFolderByPath(user, path);
   }
 
-  static async update(user: IUser, dashboard: IDashboard, path: string, updatedFolderData: Partial<IFolder>) {
+  static async update(user: IUser, dashboard: IDashboard, id: string, updatedFolderData: Partial<IFolder>) {
     const dashboardIndex = getDashboardIndex(user, dashboard);
-    const location = getLocationFromPath(path);
-    const parentLocation = getParentLocation(location);
-    const parentFolder = getFolderOrThrowError(dashboard, parentLocation).folder;
-    const folderName = location[location.length - 1];
+    const folder = getFolderOrThrowError(user, id);
+    const parentFolder = getItemParent(user, folder._id);
+
+    if (!parentFolder) {
+      throw new Error("Cannot update root folder");
+    }
+
     const parentItems = parentFolder.items;
 
     const folderIndex = parentItems.findIndex((item) => {
-      return isFolder(item) && item.name === folderName;
+      return isFolder(item) && item.name === folder.name;
     });
-
-    const folder = parentItems[folderIndex];
-
-    if (!folder) {
-      throw new Error("Folder not found");
-    }
 
     delete updatedFolderData._id;
 
-    parentItems[folderIndex] = Object.assign(folder, updatedFolderData);
+    parentFolder.items[folderIndex] = Object.assign(folder, updatedFolderData);
     user.dashboards[dashboardIndex] = dashboard;
 
     await user.save();
     return folder;
   }
 
-  static async delete(user: IUser, dashboard: IDashboard, path: string) {
-    const folder = await remove(user, dashboard, path);
+  static async delete(user: IUser, dashboard: IDashboard, id: string) {
+    const folder = await remove(user, dashboard, id);
     await user.save();
     return folder;
   }
 
-  static async move(user: IUser, dashboard: IDashboard, path: string, targetPath: string) {
-    const folder = await remove(user, dashboard, path) as IFolder;
-    await add(user, dashboard, folder, targetPath);
+  static async move(user: IUser, dashboard: IDashboard, id: string, parentId: string) {
+    const folder = await remove(user, dashboard, id) as IFolder;
+    await add(user, dashboard, folder, parentId);
     await user.save();
     return folder;
   }
@@ -164,14 +169,13 @@ class FolderController {
   static async reposition(
     user: IUser,
     dashboard: IDashboard,
-    path: string,
+    parentId: string,
     currentIndex: number,
     newIndex: number,
     strategy?: "before" | "after",
   ) {
     const dashboardIndex = getDashboardIndex(user, dashboard);
-    const location = getLocationFromPath(path);
-    const folder = getFolderOrThrowError(dashboard, location).folder;
+    const folder = getFolderOrThrowError(user, parentId);
 
     reorderArray(folder.items, currentIndex, newIndex, strategy);
 

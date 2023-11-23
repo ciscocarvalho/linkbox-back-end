@@ -1,4 +1,4 @@
-import { AnyFolder, IFolder, ILink } from "../Model/User";
+import { AnyFolder, IFolder, IItem, ILink } from "../Model/User";
 
 type Location = string[];
 type Path = string;
@@ -57,6 +57,20 @@ export const getParentLocation = (location: Location): Location => {
   return parentLocation;
 }
 
-export const removeIndexFromArray = <T>(arr: Array<T>, index: number) => {
-  return arr.filter((_, thisIndex) => thisIndex !== index);
+// https://dev.to/alisabaj/removing-an-element-in-an-array-in-place-2hb7#comment-105cf
+export const removeItemInPlace = <T>(array: T[], item: T) => {
+  let i = array.indexOf(item);
+
+  if (i === -1) {
+    return;
+  }
+
+  while (i > -1) {
+    array.splice(i, 1);
+    i = array.indexOf(item, i);
+  }
 }
+
+export const checkItemId = (item: IItem, id: string) => {
+  return item._id.toString() === id;
+};
