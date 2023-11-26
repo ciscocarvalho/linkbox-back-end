@@ -1,27 +1,12 @@
 import { Router } from "express";
 import FolderController from "../Controller/FolderController";
 import isAuthenticated from "../Middlewares/isAuthenticated";
-import { IFolder, IUser } from "../Model/User";
-import { getItemWithPath } from "./util/getItemWithPath";
+import { IFolder } from "../Model/User";
 import { getDataForItemRequest } from "./util/getDataFromRequest";
 
 const router = Router();
 
 router.use(isAuthenticated);
-
-const getFolderPath = (user: IUser, id?: string) => {
-  if (!id) {
-    return "";
-  }
-
-  const itemWithPath = getItemWithPath(user, id);
-
-  if (!itemWithPath) {
-    throw new Error("Folder not found");
-  }
-
-  return itemWithPath.path;
-}
 
 router.post("/:dashboardName/:id", async (req, res) => {
   try {
@@ -37,8 +22,7 @@ router.post("/:dashboardName/:id", async (req, res) => {
 router.get(["/:dashboardName", "/:dashboardName/:id"], async (req, res) => {
   try {
     const { user, id } = await getDataForItemRequest(req);
-    const path = getFolderPath(user, id);
-    const f = FolderController.getByPath(user, path);
+    const f = FolderController.getById(user, id);
     res.status(200).json(f);
   } catch (error: any) {
     res.status(400).json({ msg: error.message });

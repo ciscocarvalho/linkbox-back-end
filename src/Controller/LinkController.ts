@@ -1,6 +1,6 @@
 import { ObjectId } from "mongodb";
 import { AnyFolder, IDashboard, IFolder, ILink, IUser } from "../Model/User";
-import { getDashboardIndex, getItemParent, getLinkByPath } from "../util/controller";
+import { getDashboardIndex, getItemParent } from "../util/controller";
 import { isLink, removeItemInPlace } from "../util/util";
 import { getItemWithPath } from "../Routes/util/getItemWithPath";
 
@@ -79,8 +79,15 @@ class LinkController {
     return linkData;
   }
 
-  static getByPath(user: IUser, path: string) {
-    return getLinkByPath(user, path);
+  static getById(user: IUser, id: string) {
+    const itemWithPath = id ? getItemWithPath(user, id) : null;
+    const link = itemWithPath?.item;
+
+    if (!link || !isLink(link)) {
+      throw new Error("Link not found");
+    }
+
+    return link;
   }
 
   static async update(user: IUser, dashboard: IDashboard, id: string, updatedLinkData: Partial<ILink>) {

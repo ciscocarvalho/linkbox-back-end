@@ -1,6 +1,6 @@
 import { ObjectId } from "mongodb";
 import { AnyFolder, IDashboard, IFolder, IUser } from "../Model/User";
-import { getDashboardIndex, getFolderByPath, getItemParent } from "../util/controller";
+import { getDashboardIndex, getItemParent } from "../util/controller";
 import { isFolder, removeItemInPlace } from "../util/util";
 import { getItemWithPath } from "../Routes/util/getItemWithPath";
 
@@ -125,8 +125,15 @@ class FolderController {
     return folderData;
   }
 
-  static getByPath(user: IUser, path: string) {
-    return getFolderByPath(user, path);
+  static getById(user: IUser, id: string) {
+    const itemWithPath = id ? getItemWithPath(user, id) : null;
+    const folder = itemWithPath?.item;
+
+    if (!folder || !isFolder(folder)) {
+      throw new Error("Folder not found");
+    }
+
+    return folder;
   }
 
   static async update(user: IUser, dashboard: IDashboard, id: string, updatedFolderData: Partial<IFolder>) {

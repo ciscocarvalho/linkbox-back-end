@@ -1,23 +1,12 @@
 import { Router } from "express";
 import LinkController from "../Controller/LinkController";
 import isAuthenticated from "../Middlewares/isAuthenticated";
-import { ILink, IUser } from "../Model/User";
-import { getItemWithPath } from "./util/getItemWithPath";
+import { ILink } from "../Model/User";
 import { getDataForItemRequest } from "./util/getDataFromRequest";
 
 const router = Router();
 
 router.use(isAuthenticated);
-
-const getLinkPath = (user: IUser, id: string) => {
-  const itemWithPath = getItemWithPath(user, id);
-
-  if (!itemWithPath) {
-    throw new Error("Link not found");
-  }
-
-  return itemWithPath.path;
-}
 
 router.post("/:dashboardName/:id", async (req, res) => {
   try {
@@ -33,8 +22,7 @@ router.post("/:dashboardName/:id", async (req, res) => {
 router.get("/:dashboardName/:id", async (req, res) => {
   try {
     const { user, id } = await getDataForItemRequest(req);
-    const path = getLinkPath(user, id);
-    const l = LinkController.getByPath(user, path);
+    const l = LinkController.getById(user, id);
     res.status(200).json(l);
   } catch (error: any) {
     res.status(400).json({ msg: error.message });
