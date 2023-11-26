@@ -40,7 +40,7 @@ router.post("/signin", async (req, res) => {
 router.post("/signout", async (req, res) => {
   try {
     res.clearCookie("token");
-    res.status(201);
+    res.sendStatus(201);
   } catch (err: any) {
     res.status(401).send({ msg: err.message });
   }
