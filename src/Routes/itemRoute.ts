@@ -1,8 +1,8 @@
 import { Router } from "express";
-import LinkController from "../Controller/LinkController";
 import isAuthenticated from "../Middlewares/isAuthenticated";
-import { ILink } from "../Model/User";
+import { IFolder, ILink } from "../Model/User";
 import { getDataForItemRequest } from "./util/getDataFromRequest";
+import ItemController from "../Controller/ItemController";
 
 const router = Router();
 
@@ -11,9 +11,9 @@ router.use(isAuthenticated);
 router.post("/:dashboardName/:id", async (req, res) => {
   try {
     const { user, dashboard, id: parentId } = await getDataForItemRequest(req);
-    const linkData: ILink = { ...req.body };
-    const l = await LinkController.create(user, dashboard, linkData, parentId);
-    res.status(200).json(l);
+    const itemData: ILink | IFolder = { ...req.body };
+    const createdItem = await ItemController.create(user, dashboard, itemData, parentId);
+    res.status(200).json(createdItem);
   } catch (error: any) {
     res.status(400).json({ msg: error.message });
   }
@@ -22,8 +22,8 @@ router.post("/:dashboardName/:id", async (req, res) => {
 router.get("/:dashboardName/:id", async (req, res) => {
   try {
     const { user, id } = await getDataForItemRequest(req);
-    const l = LinkController.getById(user, id);
-    res.status(200).json(l);
+    const item = ItemController.getById(user, id);
+    res.status(200).json(item);
   } catch (error: any) {
     res.status(400).json({ msg: error.message });
   }
@@ -32,19 +32,20 @@ router.get("/:dashboardName/:id", async (req, res) => {
 router.put("/:dashboardName/:id", async (req, res) => {
   try {
     const { user, dashboard, id } = await getDataForItemRequest(req);
-    const updatedLinkData = { ...req.body };
-    const l = await LinkController.update(user, dashboard, id, updatedLinkData);
-    res.status(200).json(l);
+    const updatedItemData = { ...req.body };
+    const updatedItem = await ItemController.update(user, dashboard, id, updatedItemData);
+    res.status(200).json(updatedItem);
   } catch (error: any) {
-    res.status(200).json({ msg: error.message });
+    console.error(error);
+    res.status(400).json({ msg: error.message });
   }
 });
 
 router.delete("/:dashboardName/:id", async (req, res) => {
   try {
     const { user, dashboard, id } = await getDataForItemRequest(req);
-    const l = await LinkController.delete(user, dashboard, id);
-    res.status(200).json(l);
+    const deletedItem = await ItemController.delete(user, dashboard, id);
+    res.status(200).json(deletedItem);
   } catch (error: any) {
     res.status(400).json({ msg: error.message });
   }

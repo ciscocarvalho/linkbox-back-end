@@ -1,7 +1,7 @@
 import { Router } from "express";
 import isAuthenticated from "../Middlewares/isAuthenticated";
-import FolderController from "../Controller/FolderController";
 import { getDataForItemRequest } from "./util/getDataFromRequest";
+import ItemController from "../Controller/ItemController";
 
 const router = Router();
 
@@ -19,7 +19,7 @@ router.post("/:dashboardName/:id", async (req, res) => {
       newIndex: number,
       strategy?: "before" | "after",
     } = req.body;
-    const f = await FolderController.reposition(user, dashboard, parentId, currentIndex, newIndex, strategy);
+    const f = await ItemController.reposition(user, dashboard, parentId, currentIndex, newIndex, strategy);
     res.status(200).json(f);
   } catch (error: any) {
     res.status(404).json({ msg: error.message });
