@@ -12,10 +12,10 @@ router.post("/:dashboardName/:id", async (req, res) => {
   try {
     const { user, dashboard, id: parentId } = await getDataForItemRequest(req);
     const itemData: ILink | IFolder = { ...req.body };
-    const createdItem = await ItemController.create(user, dashboard, itemData, parentId);
-    res.status(200).json(createdItem);
+    const item = await ItemController.create(user, dashboard, itemData, parentId);
+    res.status(200).json({ data: { item } });
   } catch (error: any) {
-    res.status(400).json({ msg: error.message });
+    res.status(400).json({ error: { message: error.message } });
   }
 });
 
@@ -23,9 +23,9 @@ router.get("/:dashboardName/:id", async (req, res) => {
   try {
     const { user, id } = await getDataForItemRequest(req);
     const item = ItemController.getById(user, id);
-    res.status(200).json(item);
+    res.status(200).json({ data: { item } });
   } catch (error: any) {
-    res.status(400).json({ msg: error.message });
+    res.status(400).json({ error: { message: error.message } });
   }
 });
 
@@ -33,21 +33,21 @@ router.put("/:dashboardName/:id", async (req, res) => {
   try {
     const { user, dashboard, id } = await getDataForItemRequest(req);
     const updatedItemData = { ...req.body };
-    const updatedItem = await ItemController.update(user, dashboard, id, updatedItemData);
-    res.status(200).json(updatedItem);
+    const item = await ItemController.update(user, dashboard, id, updatedItemData);
+    res.status(200).json({ data: { item } });
   } catch (error: any) {
     console.error(error);
-    res.status(400).json({ msg: error.message });
+    res.status(400).json({ error: { message: error.message } });
   }
 });
 
 router.delete("/:dashboardName/:id", async (req, res) => {
   try {
     const { user, dashboard, id } = await getDataForItemRequest(req);
-    const deletedItem = await ItemController.delete(user, dashboard, id);
-    res.status(200).json(deletedItem);
+    const item = await ItemController.delete(user, dashboard, id);
+    res.status(200).json({ data: { item } });
   } catch (error: any) {
-    res.status(400).json({ msg: error.message });
+    res.status(400).json({ error: { message: error.message } });
   }
 });
 

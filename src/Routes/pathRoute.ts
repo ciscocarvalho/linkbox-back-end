@@ -18,9 +18,9 @@ router.get("/:itemId", async (req, res) => {
       throw new Error("Item not found");
     }
 
-    res.status(200).json({ path: itemWithPath.path });
+    res.status(200).json({ data: { path: itemWithPath.path } });
   } catch (error: any) {
-    res.status(400).json({ msg: error.message });
+    res.status(400).json({ error: { message: error.message } });
   }
 });
 

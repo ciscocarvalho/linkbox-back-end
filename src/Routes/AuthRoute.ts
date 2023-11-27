@@ -17,32 +17,32 @@ router.post("/signup", async (req, res) => {
   try {
     const clone = { ...req.body };
     const { password } = clone;
-    const userData = await AuthController.signup(clone);
-    const { token } = await AuthController.signin(userData.email, password);
+    const user = await AuthController.signup(clone);
+    const { token } = await AuthController.signin(user.email, password);
     setToken(res, token);
-    res.json({ auth: true, user: userData, token });
+    res.json({ data: { auth: true, user, token } });
   } catch (err: any) {
-    res.status(400).send({ auth: false, token: null, msg: err.message });
+    res.status(400).json({ error: { message: err.message } });
   }
 });
 
 router.post("/signin", async (req, res) => {
   try {
     const clone = { ...req.body };
-    const { token, userData } = await AuthController.signin(clone.email, clone.password);
+    const { token, userData: user } = await AuthController.signin(clone.email, clone.password);
     setToken(res, token);
-    res.json({ auth: true, user: userData, token });
+    res.json({ data: { auth: true, user, token } });
   } catch (err: any) {
-    res.status(401).send({ auth: false, token: null, msg: err.message });
+    res.status(401).json({ error: { message: err.message } });
   }
 });
 
 router.post("/signout", async (req, res) => {
   try {
     res.clearCookie("token");
-    res.status(201).send({ auth: false, user: null, token: null });
+    res.status(201).json({ data: { auth: false, user: null, token: null } });
   } catch (err: any) {
-    res.status(401).send({ msg: err.message });
+    res.status(401).json({ error: { message: err.message } });
   }
 });
 

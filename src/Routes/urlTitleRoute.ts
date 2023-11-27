@@ -21,9 +21,9 @@ const getUrlTitle = async (url: string) => {
 router.get("/:url", async (req, res) => {
   try {
     const { url } = req.params;
-    res.status(200).json({ title: await getUrlTitle(url) });
+    res.status(200).json({ data: { title: await getUrlTitle(url) } });
   } catch (error: any) {
-    res.status(404).json({ msg: error.message });
+    res.status(404).json({ error: { message: error.message } });
   }
 });
 

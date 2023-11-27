@@ -19,10 +19,10 @@ router.post("/:dashboardName/:id", async (req, res) => {
       newIndex: number,
       strategy?: "before" | "after",
     } = req.body;
-    const f = await ItemController.reposition(user, dashboard, parentId, currentIndex, newIndex, strategy);
-    res.status(200).json(f);
+    const folder = await ItemController.reposition(user, dashboard, parentId, currentIndex, newIndex, strategy);
+    res.status(200).json({ data: { folder } });
   } catch (error: any) {
-    res.status(404).json({ msg: error.message });
+    res.status(404).json({ error: { message: error.message } });
   }
 });
 

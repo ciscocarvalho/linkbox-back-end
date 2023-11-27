@@ -10,9 +10,9 @@ router.get("/", async (req, res) => {
   try {
     const userId = req.session!.userId!;
     const u = await UserController.getById(userId);
-    res.status(200).json(u);
+    res.status(200).json({ data: { user: u } });
   } catch (error: any) {
-    res.status(404).json({ msg: error.message });
+    res.status(404).json({ error: { message: error.message } });
   }
 });
 
@@ -20,9 +20,10 @@ router.put("/", async (req, res) => {
   try {
     const userId = req.session!.userId!;
     const updatedUserData = { ...req.body };
-    await UserController.update(userId, updatedUserData);
+    const u = await UserController.update(userId, updatedUserData);
+    res.status(200).json({ data: { user: u } });
   } catch (error: any) {
-    res.status(400).json({ msg: error.message });
+    res.status(400).json({ error: { message: error.message } });
   }
 });
 
@@ -30,9 +31,9 @@ router.delete("/", async (req, res) => {
   try {
     const userId = req.session!.userId!;
     const u = await UserController.delete(userId);
-    res.status(200).json(u);
+    res.status(200).json({ data: { user: u } });
   } catch (error: any) {
-    res.status(400).json({ msg: error.message });
+    res.status(400).json({ error: { message: error.message } });
   }
 });
 
