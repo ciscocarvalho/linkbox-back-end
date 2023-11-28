@@ -2,7 +2,9 @@ import { ObjectId } from "mongodb";
 import { AnyFolder, IDashboard, IFolder, IItem, ILink, IUser } from "../Model/User";
 import { getItemWithPath } from "../Routes/util/getItemWithPath";
 import { getDashboardIndex, getItemParent } from "../util/controller";
-import { isFolder, isLink, removeItemInPlace } from "../util/util";
+import { isFolder } from "../util/isFolder";
+import { isLink } from "../util/isLink";
+import { removeItemInPlace } from "../util/removeItemInPlace";
 import { reorderArray } from "../util/reorderArray";
 
 export const getFolderOrThrowError = (user: IUser, id: string) => {

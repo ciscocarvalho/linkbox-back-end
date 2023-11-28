@@ -1,5 +1,10 @@
 import User, { AnyFolder, IDashboard, ILink, IUser, IItem, IFolder } from "../Model/User";
-import { getFolderFromLocation, getLocationFromPath, getParentLocation, isLink, isFolder, checkItemId } from "./util";
+import { getFolderFromLocation } from "./location/getFolderFromLocation";
+import { getLocationFromPath } from "./location/getLocationFromPath";
+import { getParentLocation } from "./location/getParentLocation";
+import { isLink } from "./isLink";
+import { isFolder } from "./isFolder";
+import { checkItemId } from "./checkItemId";
 
 type Location = string[];
 

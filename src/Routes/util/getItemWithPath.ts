@@ -1,8 +1,6 @@
 import { IItem, IUser } from "../../Model/User";
+import { checkItemId } from "../../util/checkItemId";
 import { findItemAndLocation } from "../../util/controller";
-import { checkItemId } from "../../util/util";
-
-type Location = string[];
 
 const makePath = (location: Location) => {
   return location.join("/");
