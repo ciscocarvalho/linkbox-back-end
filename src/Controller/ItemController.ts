@@ -1,11 +1,13 @@
 import { ObjectId } from "mongodb";
-import { AnyFolder, IDashboard, IFolder, IItem, ILink, IUser } from "../Model/User";
+import { IDashboard, IFolder, IItem, ILink, IUser } from "../Model/User";
 import { getItemWithPath } from "../Routes/util/getItemWithPath";
 import { getDashboardIndex, getItemParent } from "../util/controller";
 import { isFolder } from "../util/isFolder";
 import { isLink } from "../util/isLink";
 import { removeItemInPlace } from "../util/removeItemInPlace";
 import { reorderArray } from "../util/reorderArray";
+import { validateLink } from "../util/validators/validateLink";
+import { validateFolder } from "../util/validators/validateFolder";
 
 export const getFolderOrThrowError = (user: IUser, id: string) => {
   const folder = getItemWithPath(user, id)?.item as IFolder | undefined;
@@ -15,38 +17,6 @@ export const getFolderOrThrowError = (user: IUser, id: string) => {
   }
 
   return folder;
-}
-
-const isTitleValid = (title: string) => {
-  return title.trim() !== "";
-}
-
-const isUrlValid = (url: string) => {
-  return url.trim() !== "";
-}
-
-const validateLinkData = (parent: IFolder, linkData: ILink) => {
-  if (!isUrlValid(linkData.url)) {
-    throw new Error("Invalid link url");
-  }
-
-  if (!isTitleValid(linkData.title)) {
-    throw new Error("Invalid link title");
-  }
-
-  if (linkUrlIsAlreadyUsed(parent, linkData.url)) {
-    throw new Error("Link url already used");
-  }
-}
-
-const folderNameIsAlreadyUsed = (parent: AnyFolder, name: string) => {
-  return !!parent.items.find((item) => isFolder(item) && item.name === name);
-}
-
-const validateFolderData = (parent: IFolder, folderData: IFolder) => {
-  if (folderNameIsAlreadyUsed(parent, folderData.name)) {
-    throw new Error("Folder name already used");
-  }
 }
 
 const prepareFolderData = (folderData: IFolder) => {
@@ -60,10 +30,10 @@ export const add = async (user: IUser, dashboard: IDashboard, itemData: IItem, p
   const parentFolder = getFolderOrThrowError(user, parentId);
 
   if (isLink(itemData)) {
-    validateLinkData(parentFolder, itemData);
+    validateLink(parentFolder, itemData);
   } else {
     prepareFolderData(itemData);
-    validateFolderData(parentFolder, itemData);
+    validateFolder(parentFolder, itemData);
   }
 
   parentFolder.items.push(itemData);
@@ -102,19 +72,6 @@ const remove = (user: IUser, dashboard: IDashboard, id: string) => {
   return item;
 }
 
-const isFolderNameValid = (name: string) => {
-  name = name.trim();
-  return name && name.indexOf("/") === -1;
-}
-
-const validateItemData = (itemData: IItem) => {
-  if (isFolder(itemData)) {
-    if (!isFolderNameValid(itemData.name)) {
-      throw new Error("Invalid folder name");
-    }
-  }
-}
-
 const handleItemDataId = (itemData: IItem) => {
   itemData._id = new ObjectId().toString();
 
@@ -137,44 +94,31 @@ const handleItemDataId = (itemData: IItem) => {
   }
 }
 
-const linkUrlIsAlreadyUsed = (parent: AnyFolder, url: string) => {
-  return !!parent.items.find((item) => isLink(item) && item.url === url);
-}
-
-const validateLinkDataForUpdate = (parentFolder: IFolder, updatedLinkData: Partial<ILink>) => {
-  const newUrl = updatedLinkData.url;
-
-  if (newUrl && linkUrlIsAlreadyUsed(parentFolder, newUrl)) {
-    throw new Error("Link url already used");
-  }
-}
-
-const update = (item: IItem, parentFolder: IFolder, updatedItemData: Partial<IItem>) => {
+const update = <T extends IItem>(item: T, parentFolder: IFolder, updatedItemData: Partial<T>) => {
   let itemIndex;
+  const updatedItem = Object.assign({ ...item }, updatedItemData);
   const parentItems = parentFolder.items;
 
-  if (isLink(item)) {
-    validateLinkDataForUpdate(parentFolder, updatedItemData);
+  if (isLink(updatedItem)) {
+    validateLink(parentFolder, updatedItem);
 
     itemIndex = parentItems.findIndex((thisItem) => {
       return isLink(thisItem) && thisItem._id === item._id;
     });
   } else {
     itemIndex = parentItems.findIndex((thisItem) => {
-      return isFolder(thisItem) && thisItem.name === item.name;
+      return isFolder(thisItem) && thisItem.name === updatedItem.name;
     });
   }
 
-
   delete updatedItemData._id;
 
-  parentFolder.items[itemIndex] = Object.assign(item, updatedItemData);
+  parentFolder.items[itemIndex] = updatedItem;
   return item;
 }
 
 class ItemController {
   static async create(user: IUser, dashboard: IDashboard, itemData: IItem, parentId: string) {
-    validateItemData(itemData);
     handleItemDataId(itemData);
     add(user, dashboard, itemData, parentId);
     await user.save();

@@ -4,8 +4,7 @@ import supertest from "supertest";
 import { MongoMemoryServer } from "mongodb-memory-server";
 import mongoose from "mongoose";
 import AuthController from "../../src/Controller/AuthController";
-import Validations from "../../src/util/validation";
-import { Request, Response } from "express";
+import { NextFunction, Request, Response } from "express";
 import jwt from "jsonwebtoken";
 import { IUser } from "../../src/Model/User";
 
@@ -38,6 +37,22 @@ const userInput: Partial<IUser> = {
   password: "90909090",
   dashboards: [],
 };
+
+const checkToken = (req: Request, res: Response, Next: NextFunction) => {
+  const token = req.cookies.token;
+
+  if (!token) {
+    return res.status(403).send("Token is required");
+  }
+
+  jwt.verify(token, process.env.SECRET!, (err: any) => {
+    if (err) {
+      return res.status(401).send("Invalid token");
+    }
+
+    Next();
+  });
+}
 
 describe("Users", () => {
   beforeAll(async () => {
@@ -84,7 +99,7 @@ describe("Users", () => {
           } as Request;
           const res = mockResponse();
 
-          Validations.checkToken(req, res, mockNext);
+          checkToken(req, res, mockNext);
 
           expect(res.status).toHaveBeenCalledWith(403);
           expect(res.send).toHaveBeenCalledWith("Token is required");
@@ -98,7 +113,7 @@ describe("Users", () => {
             },
           } as Request;
           const res = mockResponse();
-          Validations.checkToken(req, res, customNext);
+          checkToken(req, res, customNext);
 
           expect(called).toBe(true);
         });

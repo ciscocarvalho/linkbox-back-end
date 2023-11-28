@@ -2,6 +2,7 @@ import User, { IUser } from "../Model/User";
 import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
 import { ObjectId } from "mongodb";
+import { validateSignin } from "../util/validators/validateSignin";
 
 const ROUNDS = parseInt(process.env.ROUNDS!);
 
@@ -42,17 +43,8 @@ class AuthController {
 
   static async signin(email: string, password: string) {
     const user = await User.findOne({ email: email });
-
-    if (!user) {
-      throw new Error("User not found");
-    }
-
-    const passwordIsValid = bcrypt.compareSync(password, user.password);
-
-    if (!passwordIsValid) {
-      throw new Error("Invalid password");
-    }
-    const token = AuthController.genToken(user);
+    validateSignin(user, password);
+    const token = AuthController.genToken(user!);
 
     return { token, userData: email };
   }
