@@ -1,4 +1,3 @@
-import { ObjectId } from "mongodb";
 import { IDashboard, IFolder, IItem, ILink, IUser } from "../Model/User";
 import { getItemWithPath } from "../Routes/util/getItemWithPath";
 import { getDashboardIndex, getItemParent } from "../util/controller";
@@ -8,6 +7,7 @@ import { removeItemInPlace } from "../util/removeItemInPlace";
 import { reorderArray } from "../util/reorderArray";
 import { validateLink } from "../util/validators/validateLink";
 import { validateFolder } from "../util/validators/validateFolder";
+import { sanitizeItem } from "../util/sanitizers/sanitizeItem";
 
 export const getFolderOrThrowError = (user: IUser, id: string) => {
   const folder = getItemWithPath(user, id)?.item as IFolder | undefined;
@@ -19,12 +19,6 @@ export const getFolderOrThrowError = (user: IUser, id: string) => {
   return folder;
 }
 
-const prepareFolderData = (folderData: IFolder) => {
-  if (!folderData.items) {
-    folderData.items = [];
-  }
-}
-
 export const add = async (user: IUser, dashboard: IDashboard, itemData: IItem, parentId: string) => {
   const dashboardIndex = getDashboardIndex(user, dashboard);
   const parentFolder = getFolderOrThrowError(user, parentId);
@@ -32,7 +26,6 @@ export const add = async (user: IUser, dashboard: IDashboard, itemData: IItem, p
   if (isLink(itemData)) {
     validateLink(parentFolder, itemData);
   } else {
-    prepareFolderData(itemData);
     validateFolder(parentFolder, itemData);
   }
 
@@ -72,28 +65,6 @@ const remove = (user: IUser, dashboard: IDashboard, id: string) => {
   return item;
 }
 
-const handleItemDataId = (itemData: IItem) => {
-  itemData._id = new ObjectId().toString();
-
-  if (!isFolder(itemData)) {
-    return;
-  }
-
-  let items = [...itemData.items];
-
-  while (items.length > 0) {
-    const item = items.pop();
-
-    if (item) {
-      item._id = new ObjectId().toString();
-    }
-
-    if (isFolder(item)) {
-      items = [...items, ...item.items];
-    }
-  }
-}
-
 const update = <T extends IItem>(item: T, parentFolder: IFolder, updatedItemData: Partial<T>) => {
   let itemIndex;
   const updatedItem = Object.assign({ ...item }, updatedItemData);
@@ -119,7 +90,7 @@ const update = <T extends IItem>(item: T, parentFolder: IFolder, updatedItemData
 
 class ItemController {
   static async create(user: IUser, dashboard: IDashboard, itemData: IItem, parentId: string) {
-    handleItemDataId(itemData);
+    itemData = sanitizeItem(itemData);
     add(user, dashboard, itemData, parentId);
     await user.save();
     return itemData;

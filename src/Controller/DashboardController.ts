@@ -1,13 +1,13 @@
-import { ObjectId } from "mongodb";
 import User, { IDashboard, IUser } from "../Model/User";
 import { getDashboardOrThrowError } from "../util/controller";
+import { sanitizeDashboard } from "../util/sanitizers/sanitizeDashboard";
 import { validateDashboard } from "../util/validators/validateDashboard";
 
 class DashboardController {
   static async create(user: IUser, dashboard: IDashboard) {
     const { dashboards } = user;
+    dashboard = sanitizeDashboard(dashboard);
     validateDashboard(user, dashboard);
-    dashboard.tree = { items: [], _id: new ObjectId().toString() };
     dashboards.push(dashboard);
     await user.save();
     return user;
