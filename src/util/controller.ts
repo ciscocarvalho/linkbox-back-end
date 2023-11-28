@@ -1,4 +1,4 @@
-import User, { AnyFolder, IDashboard, ILink, IUser, IItem, IFolder } from "../Model/User";
+import { AnyFolder, IDashboard, ILink, IUser, IItem, IFolder } from "../Model/User";
 import { getFolderFromLocation } from "./location/getFolderFromLocation";
 import { getLocationFromPath } from "./location/getLocationFromPath";
 import { getParentLocation } from "./location/getParentLocation";
@@ -7,16 +7,6 @@ import { isFolder } from "./isFolder";
 import { checkItemId } from "./checkItemId";
 
 type Location = string[];
-
-export const getUserOrThrowError = async (userId: string) => {
-  const user = await User.findById(userId);
-
-  if (!user) {
-    throw new Error("User not found");
-  }
-
-  return user;
-}
 
 export const getDashboardOrThrowError = (user: IUser, dashboardName: string) => {
   const dashboardIndex = user.dashboards.findIndex((d) => d.name === dashboardName);

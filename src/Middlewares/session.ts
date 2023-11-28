@@ -1,7 +1,8 @@
 import { NextFunction, Request, Response } from "express";
 import jwt from "jsonwebtoken";
+import User from "../Model/User";
 
-const session = (req: Request, res: Response, next: NextFunction) => {
+const session = async (req: Request, res: Response, next: NextFunction) => {
   const token = req.cookies.token;
 
   if (!token) {
@@ -13,11 +14,15 @@ const session = (req: Request, res: Response, next: NextFunction) => {
     return;
   }
 
-  jwt.verify(token, process.env.SECRET!, (_: any, decoded: any) => {
-    req.session = {
-      authenticated: true,
-      userId: decoded?.id,
-    };
+  jwt.verify(token, process.env.SECRET!, async (_: any, decoded: any) => {
+    const userId = decoded?.id;
+    const user = await User.findById(userId);
+
+    if (user) {
+      req.session = { authenticated: true, userId, user };
+    } else {
+      req.session = { authenticated: false };
+    }
 
     next();
   });

@@ -1,6 +1,5 @@
 import { Router } from "express";
 import isAuthenticated from "../Middlewares/isAuthenticated";
-import { getUserOrThrowError } from "../util/controller";
 import { getItemWithPath } from "./util/getItemWithPath";
 
 const router = Router();
@@ -10,8 +9,7 @@ router.use(isAuthenticated);
 router.get("/:itemId", async (req, res) => {
   try {
     const { itemId } = req.params;
-    const userId = req.session!.userId!;
-    const user = await getUserOrThrowError(userId);
+    const user = req.session!.user!;
     const itemWithPath = getItemWithPath(user, itemId);
 
     if (!itemWithPath) {
