@@ -1,5 +1,4 @@
 import User, { IDashboard, IUser } from "../Model/User";
-import { getDashboardOrThrowError } from "../util/controller";
 import { sanitizeDashboard } from "../util/sanitizers/sanitizeDashboard";
 import { validateDashboard } from "../util/validators/validateDashboard";
 
@@ -19,8 +18,16 @@ class DashboardController {
     return dashboards;
   }
 
+  static getIndex(user: IUser, dashboard: IDashboard) {
+    return user.dashboards.findIndex((thisDashboard) => thisDashboard === dashboard);
+  }
+
   static async getByName(dashboardName: string, user: IUser) {
-    const { dashboard } = getDashboardOrThrowError(user, dashboardName);
+    const dashboard = user.dashboards.find((d) => d.name === dashboardName);
+
+    if (!dashboard) {
+      throw new Error("Dashboard not found");
+    }
 
     return dashboard;
   }

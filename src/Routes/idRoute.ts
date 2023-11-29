@@ -1,17 +1,17 @@
 import { Router } from "express";
 import isAuthenticated from "../Middlewares/isAuthenticated";
-import { getItemByPath } from "../util/controller";
+import ItemController from "../Controller/ItemController";
 
 const router = Router();
 
 router.use(isAuthenticated);
 
-router.get("/*", async (req, res) => {
+router.get("/*", (req, res) => {
   try {
     let path = (req.params as any)[0] as string | undefined ?? "";
     path = path.split("/").slice(1).join("/");
     const user = req.session!.user!;
-    const item = await getItemByPath(user, path);
+    const item = ItemController.getByPath(user, path);
 
     if (!item) {
       throw new Error("Item not found");

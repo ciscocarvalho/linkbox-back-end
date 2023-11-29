@@ -1,5 +1,5 @@
+import ItemController from "../../Controller/ItemController";
 import { AnyFolder, IFolder, ILink } from "../../Model/User";
-import { isLink } from "../isLink";
 
 const isTitleValid = (title: string) => {
   return title.trim() !== "";
@@ -10,7 +10,7 @@ const isUrlValid = (url: string) => {
 }
 
 const linkUrlIsAlreadyUsed = (parent: AnyFolder, url: string) => {
-  return !!parent.items.find((item) => isLink(item) && item.url === url);
+  return !!parent.items.find((item) => ItemController.isLink(item) && item.url === url);
 }
 
 export const validateLink = (parent: IFolder, link: ILink) => {

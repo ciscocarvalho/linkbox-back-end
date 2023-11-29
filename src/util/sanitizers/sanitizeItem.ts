@@ -1,11 +1,11 @@
 import { ObjectId } from "mongodb";
 import { IItem } from "../../Model/User";
-import { isFolder } from "../../util/isFolder";
+import ItemController from "../../Controller/ItemController";
 
 export const sanitizeItem = (item: IItem) => {
   item._id = new ObjectId().toString();
 
-  if (!isFolder(item)) {
+  if (!ItemController.isFolder(item)) {
     return item;
   }
 
@@ -22,7 +22,7 @@ export const sanitizeItem = (item: IItem) => {
       item._id = new ObjectId().toString();
     }
 
-    if (isFolder(item)) {
+    if (ItemController.isFolder(item)) {
       if (!item.items) {
         item.items = [];
       }

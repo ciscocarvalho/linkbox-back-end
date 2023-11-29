@@ -1,6 +1,6 @@
 import { Router } from "express";
 import isAuthenticated from "../Middlewares/isAuthenticated";
-import { getItemWithPath } from "./util/getItemWithPath";
+import ItemController from "../Controller/ItemController";
 
 const router = Router();
 
@@ -10,7 +10,7 @@ router.get("/:itemId", async (req, res) => {
   try {
     const { itemId } = req.params;
     const user = req.session!.user!;
-    const itemWithPath = getItemWithPath(user, itemId);
+    const itemWithPath = ItemController.getWithPath(user, itemId);
 
     if (!itemWithPath) {
       throw new Error("Item not found");
