@@ -25,7 +25,7 @@ const add = async (user: IUser, dashboard: IDashboard, itemData: IItem, parentId
   const parentFolder = getFolderOrThrowError(user, parentId);
 
   if (ItemController.isLink(itemData)) {
-    validateLink(parentFolder, itemData);
+    validateLink(itemData);
   } else {
     validateFolder(parentFolder, itemData);
   }
@@ -72,7 +72,7 @@ const update = <T extends IItem>(item: T, parentFolder: IFolder, updatedItemData
   const parentItems = parentFolder.items;
 
   if (ItemController.isLink(updatedItem)) {
-    validateLink(parentFolder, updatedItem);
+    validateLink(updatedItem);
 
     itemIndex = parentItems.findIndex((thisItem) => {
       return ItemController.isLink(thisItem) && thisItem._id === item._id;
@@ -108,18 +108,17 @@ class ItemController {
     return item;
   }
 
-  static getByPath(user: IUser, path: string) {
-    const folder = this.getFolderByPath(user, path);
+  static getFolderByPath(user: IUser, path: string) {
+    for (let dashboard of user.dashboards) {
+      const location = this.getLocationFromPath(path);
+      const folder = this.getFolderFromLocation(location, dashboard.tree);
 
-    if (folder) {
-      return folder;
+      if (folder) {
+        return folder;
+      }
     }
 
-    const link = this.getLinkByPath(user, path);
-
-    if (link) {
-      return link;
-    }
+    throw new Error("Item not found");
   }
 
   static getWithLocation(user: IUser, predicate: (item: IItem) => boolean) {
@@ -138,8 +137,12 @@ class ItemController {
 
       const search = ({ items }: IFolder): IItem | null => {
         for (let item of items) {
-          const itemLabel = this.getItemLabel(item);
-          location.push(itemLabel);
+          let addedName = false;
+
+          if (this.isFolder(item)) {
+            location.push(item.name);
+            addedName = true
+          }
 
           if (predicate(item)) {
             return item;
@@ -151,7 +154,9 @@ class ItemController {
             return found;
           }
 
-          location.pop();
+          if (addedName) {
+            location.pop();
+          }
         }
 
         return null;
@@ -276,74 +281,8 @@ class ItemController {
     return targetFolder;
   }
 
-  private static getFolderFromLocationOrThrowError(dashboard: IDashboard, location: ItemLocation) {
-    const folder = this.getFolderFromLocation(location, dashboard.tree);
-
-    if (!folder) {
-      throw new Error("Folder not found");
-    }
-
-    return folder as AnyFolder;
-  }
-
-  private static getLinkUrlFromLocation(linkLocation: ItemLocation) {
-    let url = linkLocation[linkLocation.length - 1];
-
-    if (!url) {
-      return null;
-    }
-
-    return decodeURIComponent(url);
-  }
-
-  private static getLinkFromLocationOrThrowError(dashboard: IDashboard, location: ItemLocation) {
-    const parentLocation = location.slice(0, location.length - 1);
-    const parentFolder = this.getFolderFromLocationOrThrowError(dashboard, parentLocation);
-    const url = this.getLinkUrlFromLocation(location);
-
-    if (url === null) {
-      throw new Error("Link not found");
-    }
-
-    const { items } = parentFolder;
-
-    const linkIndex = items.findIndex((item) => {
-      return ItemController.isLink(item) && item.url === url;
-    });
-
-    const link = items[linkIndex] as ILink | undefined;
-
-    if (!link) {
-      throw new Error("Link not found");
-    }
-
-    return { link, linkIndex };
-  }
-
   private static getLocationFromPath(path: ItemPath, separator = FOLDER_SEPARATOR): ItemLocation {
     return path === "" ? [] : path.split(separator);
-  }
-
-  private static getFolderByPath(user: IUser, path: string) {
-    for (let dashboard of user.dashboards) {
-      const location = this.getLocationFromPath(path);
-      return this.getFolderFromLocationOrThrowError(dashboard, location);
-    }
-  }
-
-  private static getLinkByPath(user: IUser, path: string) {
-    for (let dashboard of user.dashboards) {
-      const location = this.getLocationFromPath(path);
-      return this.getLinkFromLocationOrThrowError(dashboard, location).link;
-    }
-  }
-
-  private static getItemLabel(item: IItem) {
-    if (this.isFolder(item)) {
-      return item.name;
-    }
-
-    return encodeURIComponent(item.url);
   }
 }
 
