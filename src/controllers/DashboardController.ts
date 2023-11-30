@@ -22,7 +22,7 @@ class DashboardController {
     return user.dashboards.findIndex((thisDashboard) => thisDashboard === dashboard);
   }
 
-  static async getByName(dashboardName: string, user: IUser) {
+  static getByName(dashboardName: string, user: IUser) {
     const dashboard = user.dashboards.find((d) => d.name === dashboardName);
 
     if (!dashboard) {

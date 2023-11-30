@@ -9,9 +9,17 @@ import { FOLDER_SEPARATOR } from "../constants";
 
 type ItemLocation = string[];
 type ItemPath = string;
+type ItemWithData = {
+  item: IItem;
+  type: "folder" | "link";
+  dashboard: IDashboard;
+  parent: AnyFolder | null;
+  path: ItemPath;
+  location: ItemLocation;
+}
 
 const getFolderOrThrowError = (user: IUser, id: string) => {
-  const folder = ItemController.getWithPath(user, id)?.item as IFolder | undefined;
+  const folder = ItemController.getById(user, id).item as IFolder | undefined;
 
   if (!folder) {
     throw new Error("Folder not found");
@@ -48,12 +56,14 @@ const removeFolder = (item: IItem, parent: IFolder | null, dashboard: IDashboard
 
 const remove = (user: IUser, dashboard: IDashboard, id: string) => {
   const dashboardIndex = DashboardController.getIndex(user, dashboard);
-  const parent = ItemController.getParent(user, id);
-  let item = ItemController.getById(user, id);
+  let itemWithData = ItemController.getById(user, id);
 
-  if (!item) {
+  if (!itemWithData) {
     throw new Error("Item not found");
   }
+
+  const item = itemWithData.item;
+  const parent = itemWithData.parent as any;
 
   if (ItemController.isLink(item)) {
     removeLink(item, parent!);
@@ -97,30 +107,32 @@ class ItemController {
   }
 
   static getById(user: IUser, id: string) {
-    const itemWithPath = id ? this.getWithPath(user, id) : null;
-    const item = itemWithPath?.item;
+    const itemWithData = this.getWithData(user, id);
 
-    if (!item) {
+    if (!itemWithData) {
       throw new Error("Item not found");
     }
 
-    return item;
+    return itemWithData;
   }
 
-  static getFolderByPath(user: IUser, path: string) {
-    for (let dashboard of user.dashboards) {
-      const location = this.getLocationFromPath(path);
-      const folder = this.getFolderFromLocation(location, dashboard.tree);
+  static getFolderByPath(dashboard: IDashboard, path: string) {
+    const location = this.getLocationByPath(path);
+    const folder = this.getFolderByLocation(location, dashboard);
 
-      if (folder) {
-        return folder;
-      }
+    if (folder) {
+      return folder;
     }
 
     throw new Error("Item not found");
   }
 
-  static getWithLocation(user: IUser, predicate: (item: IItem) => boolean) {
+  static getWithData(user: IUser, id: string): ItemWithData | null {
+    const predicate = (item: IItem) => this.checkId(item, id);
+    let itemWithData: any = null;
+    let itemDashboard: any = null;
+    let itemParent: any = null;
+
     for (let dashboard of user.dashboards) {
       let root: IFolder = {
         name: dashboard.name,
@@ -131,7 +143,9 @@ class ItemController {
       const location: ItemLocation = [root.name];
 
       if (predicate(root)) {
-        return { item: root, location };
+        itemDashboard = dashboard;
+        itemWithData = { item: root, location };
+        break;
       }
 
       const search = ({ items }: IFolder): IItem | null => {
@@ -147,7 +161,14 @@ class ItemController {
             return item;
           }
 
-          let found = this.isFolder(item) ? search(item) : null;
+          let found;
+
+          if (this.isFolder(item)) {
+            found = search(item);
+            if (found) {
+              itemParent = item;
+            }
+          }
 
           if (found) {
             return found;
@@ -162,30 +183,40 @@ class ItemController {
       };
 
       const item = search(root);
-      return item ? { item, location } : null;
+
+      if (item) {
+        location.shift();
+        itemWithData = { item, location };
+        if (!itemParent) {
+          itemParent = root;
+        }
+        itemParent = { ...itemParent };
+        itemDashboard = dashboard;
+        delete itemParent.name;
+      }
+
+      break;
     }
 
-    return null;
-  };
-
-  static getWithPath(user: IUser, id: string) {
-    const itemWithLocation = this.getWithLocation(
-      user,
-      (item: IItem) => this.checkId(item, id)
-    );
-
-    if (!itemWithLocation) {
-      return null;
+    if (itemWithData) {
+      itemWithData.path = this.getPathByLocation(itemWithData.location);
+      itemWithData.type = this.isFolder(itemWithData.item) ? "folder" : "link";
+      itemWithData.dashboard = itemDashboard;
+      itemWithData.parent = itemParent;
     }
 
-    itemWithLocation.location = itemWithLocation.location.slice(1);
-    const path = itemWithLocation.location.join("/");
-    return { item: itemWithLocation.item, path };
-  };
+    return itemWithData;
+  }
 
   static async update(user: IUser, dashboard: IDashboard, id: string, updatedItemData: Partial<ILink>) {
-    let item = this.getById(user, id);
-    const parentFolder = this.getParent(user, item._id);
+    let itemWithData = this.getWithData(user, id);
+
+    if (!itemWithData) {
+      throw new Error("Item not found");
+    }
+
+    let { item, parent: parentFolder } = itemWithData;
+
     const dashboardIndex = DashboardController.getIndex(user, dashboard);
 
     if (!parentFolder) {
@@ -196,7 +227,7 @@ class ItemController {
       }
     }
 
-    item = update(item, parentFolder, updatedItemData);
+    item = update(item, parentFolder as any, updatedItemData);
 
     user.dashboards[dashboardIndex] = dashboard;
     await user.save();
@@ -235,17 +266,9 @@ class ItemController {
     return folder;
   }
 
-  static getParent(user: IUser, id: string) {
-    const parentWithLocation = this.getWithLocation(user, (parent) => {
-      if (!this.isFolder(parent)) {
-        return false;
-      }
-
-      return !!parent.items.find(child => this.checkId(child, id));
-    });
-
-    const parent = parentWithLocation?.item as IFolder | undefined;
-    return parent ?? null;
+  static getParent(user: IUser, id: string): IFolder | null {
+    const parent = this.getWithData(user, id)?.parent;
+    return (parent as any) ?? null;
   }
 
   static checkId(item: IItem, id: string) {
@@ -260,14 +283,23 @@ class ItemController {
     return "url" in item;
   }
 
-  private static getFolderFromLocation(location: ItemLocation, root: AnyFolder): AnyFolder | null {
-    let targetFolder = root;
+  private static getFolderByLocation(location: ItemLocation, dashboard: IDashboard): ItemWithData | null {
+    let targetFolder = dashboard.tree;
+    let parent: any = null;
+
+    let targetFolderWithData: any = {
+      type: "folder",
+      dashboard: dashboard,
+      path: this.getPathByLocation([...location]),
+      location: [...location],
+    }
 
     while (location.length > 0) {
       const folderName = location[0];
 
+      parent = targetFolder;
       targetFolder = targetFolder.items.find((item) => {
-        return "name" in item && item.name === folderName;
+        return this.isFolder(item) && item.name === folderName;
       }) as IFolder;
 
       if (!targetFolder) {
@@ -277,11 +309,25 @@ class ItemController {
       location.shift();
     }
 
-    return targetFolder;
+    if (parent === targetFolder) {
+      parent = null;
+    }
+
+    targetFolderWithData = {
+      ...targetFolderWithData,
+      item: targetFolder,
+      parent,
+    }
+
+    return targetFolderWithData;
   }
 
-  private static getLocationFromPath(path: ItemPath, separator = FOLDER_SEPARATOR): ItemLocation {
-    return path === "" ? [] : path.split(separator);
+  private static getLocationByPath(path: ItemPath, separator = FOLDER_SEPARATOR): ItemLocation {
+    return path === "" ? [] : path.split(separator).filter((name) => name !== "");
+  }
+
+  private static getPathByLocation(location: ItemLocation, separator = FOLDER_SEPARATOR): ItemPath {
+    return location.join(separator);
   }
 }
 

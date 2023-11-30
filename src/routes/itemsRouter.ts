@@ -22,8 +22,10 @@ itemsRouter.post("/:dashboardName/:id", async (req, res) => {
 itemsRouter.get("/:dashboardName/:id", async (req, res) => {
   try {
     const { user, id } = await getDataForItemRequest(req);
-    const item = ItemController.getById(user, id);
-    res.status(200).json({ data: { item } });
+    const itemWithData = ItemController.getWithData(user, id) as any;
+    delete itemWithData?.dashboard?.tree?.items;
+    delete itemWithData?.parent?.items;
+    res.status(200).json({ data: itemWithData });
   } catch (error: any) {
     res.status(400).json({ error: { message: error.message } });
   }

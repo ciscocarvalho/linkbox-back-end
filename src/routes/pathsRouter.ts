@@ -10,13 +10,13 @@ pathsRouter.get("/:itemId", async (req, res) => {
   try {
     const { itemId } = req.params;
     const user = req.session!.user!;
-    const itemWithPath = ItemController.getWithPath(user, itemId);
+    const itemWithData = ItemController.getWithData(user, itemId);
 
-    if (!itemWithPath) {
+    if (!itemWithData) {
       throw new Error("Item not found");
     }
 
-    res.status(200).json({ data: { path: itemWithPath.path } });
+    res.status(200).json({ data: { path: itemWithData.path } });
   } catch (error: any) {
     res.status(400).json({ error: { message: error.message } });
   }

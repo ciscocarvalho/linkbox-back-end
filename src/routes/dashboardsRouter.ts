@@ -32,7 +32,7 @@ dashboardsRouter.get("/:dashboardName", async (req, res) => {
   try {
     const { dashboardName } = req.params;
     const user = req.session!.user!;
-    const dashboard = await DashboardController.getByName(dashboardName, user);
+    const dashboard = DashboardController.getByName(dashboardName, user);
     res.status(200).json({ data: { dashboard } });
   } catch (error: any) {
     res.status(400).json({ error: { message: error.message } });
