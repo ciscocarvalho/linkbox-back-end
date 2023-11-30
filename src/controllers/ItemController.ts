@@ -67,26 +67,25 @@ const remove = (user: IUser, dashboard: IDashboard, id: string) => {
 }
 
 const update = <T extends IItem>(item: T, parentFolder: IFolder, updatedItemData: Partial<T>) => {
-  let itemIndex;
+  delete updatedItemData._id;
+
+  if ("items" in updatedItemData) {
+    delete updatedItemData.items;
+  }
+
   const updatedItem = Object.assign({ ...item }, updatedItemData);
   const parentItems = parentFolder.items;
 
   if (ItemController.isLink(updatedItem)) {
     validateLink(updatedItem);
-
-    itemIndex = parentItems.findIndex((thisItem) => {
-      return ItemController.isLink(thisItem) && thisItem._id === item._id;
-    });
-  } else {
-    itemIndex = parentItems.findIndex((thisItem) => {
-      return ItemController.isFolder(thisItem) && thisItem.name === updatedItem.name;
-    });
   }
 
-  delete updatedItemData._id;
+  const itemIndex = parentItems.findIndex((thisItem) => {
+    return ItemController.checkId(thisItem, updatedItem._id);
+  });
 
   parentFolder.items[itemIndex] = updatedItem;
-  return item;
+  return updatedItem;
 }
 
 class ItemController {
