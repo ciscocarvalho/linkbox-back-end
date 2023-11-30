@@ -3,12 +3,11 @@ import app from "../../src/app";
 import supertest from "supertest";
 import { MongoMemoryServer } from "mongodb-memory-server";
 import mongoose from "mongoose";
-import AuthController from "../../src/Controller/AuthController";
+import AuthController from "../../src/controllers/AuthController";
 import { NextFunction, Request, Response } from "express";
 import jwt from "jsonwebtoken";
-import { IUser } from "../../src/Model/User";
-
-const key = process.env.SECRET!;
+import { IUser } from "../../src/models/User";
+import { SECRET } from "../../src/constants";
 
 const userId = new mongoose.Types.ObjectId();
 
@@ -45,7 +44,7 @@ const checkToken = (req: Request, res: Response, Next: NextFunction) => {
     return res.status(403).send("Token is required");
   }
 
-  jwt.verify(token, process.env.SECRET!, (err: any) => {
+  jwt.verify(token, SECRET, (err: any) => {
     if (err) {
       return res.status(401).send("Invalid token");
     }
@@ -106,7 +105,7 @@ describe("Users", () => {
           expect(mockNext).not.toHaveBeenCalled();
         });
         it("Should call the next function if the token is valid ", () => {
-          const token = jwt.sign(userInput, key);
+          const token = jwt.sign(userInput, SECRET);
           const req: Request = {
             cookies: {
               token: token,

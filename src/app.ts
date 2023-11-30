@@ -1,14 +1,14 @@
 import express from "express";
-import routes from "./Routes/index";
+import routes from "./routes/index";
 import cookieParser from "cookie-parser";
 import swaggerUi from "swagger-ui-express";
 import YAML from "yamljs";
 import cors from "cors";
-import session from "./Middlewares/session";
+import session from "./middlewares/session";
+import { FRONTEND_URL } from "./constants";
 
 const swaggerDocument = YAML.load("./openapi.yml");
 const app = express();
-const FRONTEND_URL = process.env.FRONTEND_URL;
 
 app.use(express.json());
 app.use(cookieParser());

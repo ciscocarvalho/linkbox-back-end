@@ -1,8 +1,7 @@
 import "dotenv/config";
 import app from "./src/app";
 import connectToMongoDB from "./src/database";
-
-const PORT = process.env.PORT || 3000;
+import { PORT } from "./src/constants";
 
 async function startDB() {
   await connectToMongoDB();

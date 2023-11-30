@@ -1,9 +1,8 @@
 import { Connection, connect, connection } from "mongoose";
-
-const mongoURL = process.env.DB_URL!;
+import { DB_URL } from "./constants";
 
 async function connectToMongoDB(): Promise<Connection> {
-  await connect(mongoURL);
+  await connect(DB_URL);
   return connection;
 }
 
