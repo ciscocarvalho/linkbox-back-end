@@ -98,6 +98,11 @@ const dashboardSchema = {
 }
 
 const userSchema = new Schema<IUser>({
+  username: {
+    type: String,
+    required: true,
+    unique: false,
+  },
   email: {
     type: String,
     required: true,
