@@ -4,11 +4,11 @@ import ItemController from "../controllers/ItemController";
 import DashboardController from "../controllers/DashboardController";
 import { FOLDER_SEPARATOR } from "../constants";
 
-const folderIdsRouter = Router();
+const foldersFromPathsRouter = Router();
 
-folderIdsRouter.use(isAuthenticated);
+foldersFromPathsRouter.use(isAuthenticated);
 
-folderIdsRouter.get("/:dashboardName/*", (req, res) => {
+foldersFromPathsRouter.get("/:dashboardName/*", (req, res) => {
   try {
     let path = ((req.params as any)[0] as string | undefined) ?? "";
     const user = req.session!.user!;
@@ -31,4 +31,4 @@ folderIdsRouter.get("/:dashboardName/*", (req, res) => {
   }
 });
 
-export default folderIdsRouter;
+export default foldersFromPathsRouter;
