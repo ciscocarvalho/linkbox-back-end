@@ -140,7 +140,7 @@ class ItemController {
         _id: dashboard.tree._id,
       }
 
-      const location: ItemLocation = [root.name];
+      const location: ItemLocation = [];
 
       if (predicate(root)) {
         itemDashboard = dashboard;
@@ -185,7 +185,6 @@ class ItemController {
       const item = search(root);
 
       if (item) {
-        location.shift();
         itemWithData = { item, location };
         if (!itemParent) {
           itemParent = root;
