@@ -1,7 +1,7 @@
 import { IUser } from "../../models/User";
 import bcrypt from "bcrypt";
 
-export const validateSignin = async (user: IUser | null, password: string) => {
+export const validateSignin = (user: IUser | null, password: string) => {
   if (!user) {
     throw new Error("User not found");
   }
