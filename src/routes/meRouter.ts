@@ -9,10 +9,10 @@ meRouter.use(isAuthenticated);
 meRouter.get("/", async (req, res) => {
   try {
     const userId = req.session!.userId!;
-    const u = await UserController.getById(userId);
-    res.status(200).json({ data: { user: u } });
+    const user = await UserController.getById(userId);
+    res.sendData({ user });
   } catch (error: any) {
-    res.status(404).json({ error: { message: error.message } });
+    res.handleError(error);
   }
 });
 
@@ -20,20 +20,20 @@ meRouter.put("/", async (req, res) => {
   try {
     const userId = req.session!.userId!;
     const updatedUserData = { ...req.body };
-    const u = await UserController.update(userId, updatedUserData);
-    res.status(200).json({ data: { user: u } });
+    const user = await UserController.update(userId, updatedUserData);
+    res.sendData({ user });
   } catch (error: any) {
-    res.status(400).json({ error: { message: error.message } });
+    res.handleError(error);
   }
 });
 
 meRouter.delete("/", async (req, res) => {
   try {
     const userId = req.session!.userId!;
-    const u = await UserController.delete(userId);
-    res.status(200).json({ data: { user: u } });
+    const user = await UserController.delete(userId);
+    res.sendData({ user });
   } catch (error: any) {
-    res.status(400).json({ error: { message: error.message } });
+    res.handleError(error);
   }
 });
 

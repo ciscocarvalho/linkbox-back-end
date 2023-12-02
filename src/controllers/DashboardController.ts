@@ -1,3 +1,4 @@
+import { DASHBOARD_NOT_FOUND } from "../constants/responseErrors";
 import User, { IDashboard, IUser } from "../models/User";
 import { sanitizeDashboard } from "../utils/sanitizers/sanitizeDashboard";
 import { validateDashboard } from "../utils/validators/validateDashboard";
@@ -26,7 +27,7 @@ class DashboardController {
     const dashboard = user.dashboards.find((d) => d.name === dashboardName);
 
     if (!dashboard) {
-      throw new Error("Dashboard not found");
+      throw DASHBOARD_NOT_FOUND;
     }
 
     return dashboard;
@@ -38,7 +39,7 @@ class DashboardController {
     const dashboard = dashboards[dashboardIndex];
 
     if (!dashboard) {
-      throw new Error("Dashboard not found");
+      throw DASHBOARD_NOT_FOUND;
     }
 
     dashboards[dashboardIndex] = Object.assign(dashboard, updatedDashboardData);

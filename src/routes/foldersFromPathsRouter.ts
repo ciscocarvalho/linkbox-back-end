@@ -1,8 +1,9 @@
 import { Router } from "express";
-import isAuthenticated from "../middlewares/isAuthenticated";
-import ItemController from "../controllers/ItemController";
-import DashboardController from "../controllers/DashboardController";
 import { FOLDER_SEPARATOR } from "../constants";
+import DashboardController from "../controllers/DashboardController";
+import ItemController from "../controllers/ItemController";
+import isAuthenticated from "../middlewares/isAuthenticated";
+import { FOLDER_NOT_FOUND } from "../constants/responseErrors";
 
 const foldersFromPathsRouter = Router();
 
@@ -21,13 +22,13 @@ foldersFromPathsRouter.get("/:dashboardName/*", (req, res) => {
     const dashboard = DashboardController.getByName(dashboardName, user);
     const folderWithData = ItemController.getFolderByPath(dashboard, path);
 
-    if (!folderWithData) {
-      throw new Error("Folder not found");
+    if (folderWithData) {
+      res.sendData(folderWithData);
+    } else {
+      throw FOLDER_NOT_FOUND;
     }
-
-    res.status(200).json({ data: folderWithData });
   } catch (error: any) {
-    res.status(400).json({ error: { message: error.message } });
+    res.handleError(error);
   }
 });
 

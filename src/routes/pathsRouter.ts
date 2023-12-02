@@ -1,6 +1,7 @@
 import { Router } from "express";
-import isAuthenticated from "../middlewares/isAuthenticated";
 import ItemController from "../controllers/ItemController";
+import isAuthenticated from "../middlewares/isAuthenticated";
+import { ITEM_NOT_FOUND } from "../constants/responseErrors";
 
 const pathsRouter = Router();
 
@@ -12,13 +13,13 @@ pathsRouter.get("/:itemId", async (req, res) => {
     const user = req.session!.user!;
     const itemWithData = ItemController.getWithData(user, itemId);
 
-    if (!itemWithData) {
-      throw new Error("Item not found");
+    if (itemWithData) {
+      res.sendData({ path: itemWithData.path });
+    } else {
+      throw ITEM_NOT_FOUND;
     }
-
-    res.status(200).json({ data: { path: itemWithData.path } });
   } catch (error: any) {
-    res.status(400).json({ error: { message: error.message } });
+    res.handleError(error);
   }
 });
 

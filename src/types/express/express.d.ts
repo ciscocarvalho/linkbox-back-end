@@ -6,4 +6,9 @@ declare namespace Express {
          user?: import("../../models/User").IUser
       }
    }
+   export interface Response {
+      sendData: (data: object, statusCode?: number) => void;
+      sendErrors: (errors: import("../../utils/ResponseError").ResponseError[], statusCode?: number) => void;
+      handleError: (error: any) => void;
+   }
 }

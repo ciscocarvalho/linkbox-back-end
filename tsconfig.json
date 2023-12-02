@@ -3,7 +3,10 @@
     "lib": ["es5", "es6"],
     "types": ["node", "jest"],
     "outDir": "build",
-    "target": "es5",
+    // WARN: don't set target to pre-es6 versions, otherwise TypeScript won't
+    // correctly subclass Error.
+    // see: https://stackoverflow.com/a/58050942
+    "target": "es6",
     "strict": true,
     "module": "commonjs",
     "moduleResolution": "node",

@@ -6,6 +6,7 @@ import { validateFolder } from "../utils/validators/validateFolder";
 import { sanitizeItem } from "../utils/sanitizers/sanitizeItem";
 import DashboardController from "./DashboardController";
 import { FOLDER_SEPARATOR } from "../constants";
+import { CANNOT_UPDATE_ROOT_FOLDER, FOLDER_NOT_FOUND, ITEM_NOT_FOUND } from "../constants/responseErrors";
 
 type ItemLocation = string[];
 type ItemPath = string;
@@ -22,7 +23,7 @@ const getFolderOrThrowError = (user: IUser, id: string) => {
   const folder = ItemController.getById(user, id).item as IFolder | undefined;
 
   if (!folder) {
-    throw new Error("Folder not found");
+    throw FOLDER_NOT_FOUND;
   }
 
   return folder;
@@ -59,7 +60,7 @@ const remove = (user: IUser, dashboard: IDashboard, id: string) => {
   let itemWithData = ItemController.getById(user, id);
 
   if (!itemWithData) {
-    throw new Error("Item not found");
+    throw ITEM_NOT_FOUND;
   }
 
   const item = itemWithData.item;
@@ -110,7 +111,7 @@ class ItemController {
     const itemWithData = this.getWithData(user, id);
 
     if (!itemWithData) {
-      throw new Error("Item not found");
+      throw ITEM_NOT_FOUND;
     }
 
     return itemWithData;
@@ -124,7 +125,7 @@ class ItemController {
       return folder;
     }
 
-    throw new Error("Item not found");
+    throw ITEM_NOT_FOUND;
   }
 
   static getWithData(user: IUser, id: string): ItemWithData | null {
@@ -211,7 +212,7 @@ class ItemController {
     let itemWithData = this.getWithData(user, id);
 
     if (!itemWithData) {
-      throw new Error("Item not found");
+      throw ITEM_NOT_FOUND;
     }
 
     let { item, parent: parentFolder } = itemWithData;
@@ -220,9 +221,9 @@ class ItemController {
 
     if (!parentFolder) {
       if (this.isLink(item)) {
-        throw new Error("Folder not found");
+        throw FOLDER_NOT_FOUND;
       } else {
-        throw new Error("Cannot update root folder");
+        throw CANNOT_UPDATE_ROOT_FOLDER;
       }
     }
 

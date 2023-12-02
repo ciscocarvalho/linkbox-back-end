@@ -1,3 +1,4 @@
+import { USER_NOT_FOUND } from "../constants/responseErrors";
 import User, { IUser } from "../models/User";
 
 class UserController {
@@ -7,7 +8,7 @@ class UserController {
     const user = await User.findById(userId, "-password");
 
     if (!user) {
-      throw new Error("User not found");
+      throw USER_NOT_FOUND;
     }
 
     return user;
@@ -19,7 +20,7 @@ class UserController {
     });
 
     if (!updatedUser) {
-      throw new Error("User not found");
+      throw USER_NOT_FOUND;
     }
 
     return updatedUser;
@@ -29,7 +30,7 @@ class UserController {
     const deletedUser = await User.findByIdAndRemove(userId);
 
     if (!deletedUser) {
-      throw new Error("User not found");
+      throw USER_NOT_FOUND;
     }
 
     return deletedUser;

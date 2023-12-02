@@ -1,3 +1,4 @@
+import { FOLDER_NAME_ALREADY_USED, INVALID_FOLDER_NAME } from "../../constants/responseErrors";
 import ItemController from "../../controllers/ItemController";
 import { AnyFolder, IFolder } from "../../models/User";
 
@@ -12,10 +13,10 @@ const folderNameIsAlreadyUsed = (parent: AnyFolder, name: string) => {
 
 export const validateFolder = (parent: IFolder, folderData: IFolder) => {
   if (!isFolderNameValid(folderData.name)) {
-    throw new Error("Invalid folder name");
+    throw INVALID_FOLDER_NAME;
   }
 
   if (folderNameIsAlreadyUsed(parent, folderData.name)) {
-    throw new Error("Folder name already used");
+    throw FOLDER_NAME_ALREADY_USED;
   }
 };
