@@ -15,6 +15,10 @@ const responseHelpers = (req: Request, res: Response, next: NextFunction) => {
     if (error instanceof ResponseError) {
       console.error(error);
       res.sendErrors([error]);
+    } else if (Array.isArray(error)) {
+      console.error(`${error.length} errors:\n`);
+      error.forEach((error) => console.error(error));
+      res.sendErrors(error);
     } else {
       console.error("Unknown error:\n", error);
       res.sendErrors([UNKNOWN_ERROR]);

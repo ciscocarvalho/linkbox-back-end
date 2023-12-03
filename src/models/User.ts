@@ -2,6 +2,7 @@ import { Document } from "mongodb";
 import { Schema, model } from "mongoose";
 
 export interface IUser extends Document {
+  username: string;
   email: string;
   password: string;
   dashboards: IDashboard[];

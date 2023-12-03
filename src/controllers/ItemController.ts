@@ -1,12 +1,13 @@
 import { AnyFolder, IDashboard, IFolder, IItem, ILink, IUser } from "../models/User";
 import { removeItemInPlace } from "../utils/removeItemInPlace";
 import { reorderArray } from "../utils/reorderArray";
-import { validateLink } from "../utils/validators/validateLink";
-import { validateFolder } from "../utils/validators/validateFolder";
-import { sanitizeItem } from "../utils/sanitizers/sanitizeItem";
 import DashboardController from "./DashboardController";
 import { FOLDER_SEPARATOR } from "../constants";
-import { CANNOT_UPDATE_ROOT_FOLDER, FOLDER_NOT_FOUND, ITEM_NOT_FOUND } from "../constants/responseErrors";
+import { FOLDER_NOT_FOUND, ITEM_NOT_FOUND, UNKNOWN_ERROR } from "../constants/responseErrors";
+import { FolderValidator } from "../utils/validators/FolderValidator";
+import { LinkValidator } from "../utils/validators/LinkValidator";
+import { LinkSanitizer } from "../utils/sanitizers/LinkSanitizer";
+import { FolderSanitizer } from "../utils/sanitizers/FolderSanitizer";
 
 type ItemLocation = string[];
 type ItemPath = string;
@@ -29,17 +30,24 @@ const getFolderOrThrowError = (user: IUser, id: string) => {
   return folder;
 }
 
-const add = async (user: IUser, dashboard: IDashboard, itemData: IItem, parentId: string) => {
+const add = async (user: IUser, dashboard: IDashboard, itemCandidate: IItem, parentId: string) => {
   const dashboardIndex = DashboardController.getIndex(user, dashboard);
   const parentFolder = getFolderOrThrowError(user, parentId);
+  let validation;
 
-  if (ItemController.isLink(itemData)) {
-    validateLink(itemData);
+  if (ItemController.isLink(itemCandidate)) {
+    itemCandidate = LinkSanitizer.sanitizeCreation(itemCandidate) as ILink;
+    validation = LinkValidator.validateCreation(itemCandidate);
   } else {
-    validateFolder(parentFolder, itemData);
+    itemCandidate = FolderSanitizer.sanitizeCreation(itemCandidate) as IFolder;
+    validation = FolderValidator.validateCreation(parentFolder, itemCandidate);
   }
 
-  parentFolder.items.push(itemData);
+  if (validation.errors) {
+    throw validation.errors;
+  }
+
+  parentFolder.items.push(itemCandidate);
   user.dashboards[dashboardIndex] = dashboard;
 }
 
@@ -77,22 +85,30 @@ const remove = (user: IUser, dashboard: IDashboard, id: string) => {
   return item;
 }
 
-const update = <T extends IItem>(item: T, parentFolder: IFolder, updatedItemData: Partial<T>) => {
-  delete updatedItemData._id;
+const update = <T extends IItem>(item: T, parentFolder: IFolder, itemData: Partial<T>) => {
+  const parentItems = parentFolder.items;
+  let updatedItem: IItem | undefined;
+  let validation;
 
-  if ("items" in updatedItemData) {
-    delete updatedItemData.items;
+  if (ItemController.isLink(item)) {
+    itemData = LinkSanitizer.sanitizeUpdate(itemData) as any;
+    validation = LinkValidator.validateUpdate(item, itemData);
+    updatedItem = validation.data?.updatedLink;
+  } else {
+    itemData = FolderSanitizer.sanitizeUpdate(itemData) as any;
+    validation = FolderValidator.validateUpdate(parentFolder, item, itemData);
+    updatedItem = validation.data?.updatedFolder;
+    console.log("updatedItem:", updatedItem);
   }
 
-  const updatedItem = Object.assign({ ...item }, updatedItemData);
-  const parentItems = parentFolder.items;
-
-  if (ItemController.isLink(updatedItem)) {
-    validateLink(updatedItem);
+  if (validation.errors) {
+    throw validation.errors;
+  } else if (!updatedItem) {
+    throw UNKNOWN_ERROR;
   }
 
   const itemIndex = parentItems.findIndex((thisItem) => {
-    return ItemController.checkId(thisItem, updatedItem._id);
+    return ItemController.checkId(thisItem, updatedItem!._id);
   });
 
   parentFolder.items[itemIndex] = updatedItem;
@@ -100,11 +116,10 @@ const update = <T extends IItem>(item: T, parentFolder: IFolder, updatedItemData
 }
 
 class ItemController {
-  static async create(user: IUser, dashboard: IDashboard, itemData: IItem, parentId: string) {
-    itemData = sanitizeItem(itemData);
-    add(user, dashboard, itemData, parentId);
+  static async create(user: IUser, dashboard: IDashboard, itemCandidate: IItem, parentId: string) {
+    await add(user, dashboard, itemCandidate, parentId);
     await user.save();
-    return itemData;
+    return itemCandidate;
   }
 
   static getById(user: IUser, id: string) {
@@ -121,11 +136,11 @@ class ItemController {
     const location = this.getLocationByPath(path);
     const folder = this.getFolderByLocation(location, dashboard);
 
-    if (folder) {
-      return folder;
+    if (!folder) {
+      throw FOLDER_NOT_FOUND;
     }
 
-    throw ITEM_NOT_FOUND;
+    return folder;
   }
 
   static getWithData(user: IUser, id: string): ItemWithData | null {
@@ -209,6 +224,7 @@ class ItemController {
   }
 
   static async update(user: IUser, dashboard: IDashboard, id: string, updatedItemData: Partial<ILink>) {
+    const dashboardIndex = DashboardController.getIndex(user, dashboard);
     let itemWithData = this.getWithData(user, id);
 
     if (!itemWithData) {
@@ -216,17 +232,6 @@ class ItemController {
     }
 
     let { item, parent: parentFolder } = itemWithData;
-
-    const dashboardIndex = DashboardController.getIndex(user, dashboard);
-
-    if (!parentFolder) {
-      if (this.isLink(item)) {
-        throw FOLDER_NOT_FOUND;
-      } else {
-        throw CANNOT_UPDATE_ROOT_FOLDER;
-      }
-    }
-
     item = update(item, parentFolder as any, updatedItemData);
 
     user.dashboards[dashboardIndex] = dashboard;

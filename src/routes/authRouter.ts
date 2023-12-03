@@ -6,9 +6,9 @@ const authRouter = Router();
 authRouter.post("/signup", async (req, res) => {
   try {
     const clone = { ...req.body };
-    const { password } = clone;
-    const user = await AuthController.signup(clone);
-    const { token } = await AuthController.signin(user.email, password);
+    const user = await AuthController.signup({ ...clone });
+    const signInData = { ...clone } // WARN: THIS CANNOT BE A MONGODB DOCUMENT
+    const { token } = await AuthController.signin(signInData);
     res.sendData({ auth: true, user, token });
   } catch (error: any) {
     res.handleError(error);
@@ -18,8 +18,8 @@ authRouter.post("/signup", async (req, res) => {
 authRouter.post("/signin", async (req, res) => {
   try {
     const clone = { ...req.body };
-    const { token, userData: user } = await AuthController.signin(clone.email, clone.password);
-    res.sendData({ auth: true, user, token });
+    const { token, email } = await AuthController.signin(clone);
+    res.sendData({ auth: true, email, token });
   } catch (error: any) {
     res.handleError(error);
   }

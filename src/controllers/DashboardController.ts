@@ -1,14 +1,28 @@
+import { ObjectId } from "mongodb";
 import { DASHBOARD_NOT_FOUND } from "../constants/responseErrors";
 import User, { IDashboard, IUser } from "../models/User";
-import { sanitizeDashboard } from "../utils/sanitizers/sanitizeDashboard";
-import { validateDashboard } from "../utils/validators/validateDashboard";
+import { DashboardSanitizer } from "../utils/sanitizers/DashboardSanitizer";
+import { DashboardValidator } from "../utils/validators/DashboardValidator";
+import { betterAssign } from "../utils/betterAssign";
 
 class DashboardController {
-  static async create(user: IUser, dashboard: IDashboard) {
+  static getDefault() {
+    return {
+      name: "default",
+      tree: { items: [], _id: new ObjectId().toString() },
+    }
+  }
+
+  static async create(user: IUser, dashboard: Partial<IDashboard>) {
     const { dashboards } = user;
-    dashboard = sanitizeDashboard(dashboard);
-    validateDashboard(user, dashboard);
-    dashboards.push(dashboard);
+    dashboard = DashboardSanitizer.sanitizeCreation(dashboard);
+    const validation = DashboardValidator.validateCreation(user, dashboard);
+
+    if (validation.errors) {
+      throw validation.errors;
+    }
+
+    dashboards.push(dashboard as IDashboard);
     await user.save();
     return user;
   }
@@ -33,16 +47,18 @@ class DashboardController {
     return dashboard;
   }
 
-  static async update(dashboardName: string, user: IUser, updatedDashboardData: Partial<IDashboard>) {
+  static async update(dashboardName: string, user: IUser, dashboardData: Partial<IDashboard>) {
     const { dashboards } = user;
-    const dashboardIndex = user.dashboards.findIndex((d) => d.name === dashboardName);
-    const dashboard = dashboards[dashboardIndex];
+    const dashboard = this.getByName(dashboardName, user);
+    const dashboardIndex = this.getIndex(user, dashboard);
+    dashboardData = DashboardSanitizer.sanitizeUpdate(dashboard);
+    const validation = DashboardValidator.validateUpdate(user, dashboard, dashboardData);
 
-    if (!dashboard) {
-      throw DASHBOARD_NOT_FOUND;
+    if (validation.errors) {
+      throw validation.errors;
     }
 
-    dashboards[dashboardIndex] = Object.assign(dashboard, updatedDashboardData);
+    dashboards[dashboardIndex] = betterAssign(dashboard, dashboardData);
 
     await user.save();
     return dashboard;

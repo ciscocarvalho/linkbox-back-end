@@ -42,9 +42,9 @@ dashboardsRouter.get("/:dashboardName", async (req, res) => {
 dashboardsRouter.put("/:dashboardName", async (req, res) => {
   try {
     const { dashboardName } = req.params;
-    const updatedDashboardData = { ...req.body };
+    const dashboardData = { ...req.body };
     const user = req.session!.user!;
-    const dashboard = await DashboardController.update(dashboardName, user, updatedDashboardData);
+    const dashboard = await DashboardController.update(dashboardName, user, dashboardData);
     res.sendData({ dashboard });
   } catch (error: any) {
     res.handleError(error);

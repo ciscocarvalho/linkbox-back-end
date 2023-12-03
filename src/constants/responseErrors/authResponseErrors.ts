@@ -1,21 +1,32 @@
 import { ResponseError } from "../../utils/ResponseError";
 
+export * from "./authResponseErrors/signinResponseErrors";
+export * from "./authResponseErrors/signupResponseErrors";
+
 const ERROR_TYPE = "AUTH_ERROR";
 
-export const NO_CURRENT_USER_AUTHENTICATED = new ResponseError({
+export const USER_NOT_AUTHENTICATED = new ResponseError({
   type: ERROR_TYPE,
-  message: "No current user authenticated",
-  userMessage: "Não há usuário autenticado",
-});
-
-export const INVALID_PASSWORD = new ResponseError({
-  type: ERROR_TYPE,
-  message: "Invalid password",
-  userMessage: "Senha inválida",
+  message: "User is not authenticated.",
+  userMessage: "Usuário não está autenticado.",
 });
 
 export const USER_NOT_FOUND = new ResponseError({
   type: ERROR_TYPE,
-  message: "User not found",
-  userMessage: "Usuário não encontrado",
+  message: "User was not found.",
+  userMessage: "Usuário não foi encontrado.",
+});
+
+export const EMAIL_IS_REQUIRED = new ResponseError({
+  type: ERROR_TYPE,
+  field: "email",
+  message: "Email is required.",
+  userMessage: "O email é obrigatório.",
+});
+
+export const PASSWORD_IS_REQUIRED = new ResponseError({
+  type: ERROR_TYPE,
+  field: "password",
+  message: "Password is required.",
+  userMessage: "A senha é obrigatória.",
 });
