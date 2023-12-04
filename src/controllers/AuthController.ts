@@ -33,7 +33,7 @@ class AuthController {
 
   private static generateToken(user: IUser) {
     const token = jwt.sign({ id: user.id }, SECRET, {
-      expiresIn: "1h",
+      expiresIn: "5h",
     });
     return token;
   }

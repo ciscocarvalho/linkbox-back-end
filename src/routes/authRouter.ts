@@ -6,7 +6,7 @@ const authRouter = Router();
 
 const setToken = (res: any, token: string) => {
   res.cookie("token", token, {
-    maxAge: 3600000,
+    maxAge: 18000000,
     httpOnly: false,
     sameSite: "none",
     secure: __prod__,
