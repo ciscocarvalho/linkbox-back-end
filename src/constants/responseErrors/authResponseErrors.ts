@@ -2,6 +2,7 @@ import { ResponseError } from "../../utils/ResponseError";
 
 export * from "./authResponseErrors/signinResponseErrors";
 export * from "./authResponseErrors/signupResponseErrors";
+export * from "./authResponseErrors/changePasswordResponseErrors";
 
 const ERROR_TYPE = "AUTH_ERROR";
 

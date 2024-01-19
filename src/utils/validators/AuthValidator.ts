@@ -22,7 +22,7 @@ export class AuthValidator {
 
     if (!userData.password) {
       errors.push(PASSWORD_IS_REQUIRED);
-    } else if (userData.password.length < 7) {
+    } else if (!this.checkPasswordStrength(userData.password)) {
       errors.push(PASSWORD_IS_TOO_WEAK);
     }
 
@@ -57,5 +57,9 @@ export class AuthValidator {
     }
 
     return { data: { user } };
+  }
+
+  static checkPasswordStrength(password: string) {
+    return password.length >= 7;
   }
 }
