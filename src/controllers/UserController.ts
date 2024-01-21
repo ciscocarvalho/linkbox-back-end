@@ -60,13 +60,20 @@ class UserController {
     return updatedUser;
   }
 
-  static async delete(userId: string) {
-    const deletedUser = await User.findByIdAndRemove(userId);
+  static async delete(userId: string, password: string) {
+    const user = await User.findById(userId);
 
-    if (!deletedUser) {
+    if (!user) {
       throw USER_NOT_FOUND;
     }
 
+    const { errors } = UserValidator.validateDelete(user, password);
+
+    if (errors.length > 0) {
+      throw errors;
+    }
+
+    const deletedUser = await user.deleteOne();
     return deletedUser;
   }
 }

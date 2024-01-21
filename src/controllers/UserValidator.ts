@@ -2,7 +2,7 @@ import { CURRENT_PASSWORD_IS_REQUIRED, CURRENT_PASSWORD_IS_WRONG, NEW_PASSWORD_I
 import User, { IUser } from "../models/User";
 import bcrypt from "bcrypt";
 import { AuthValidator } from "../utils/validators/AuthValidator";
-import { EMAIL_ALREADY_USED } from "../constants/responseErrors";
+import { EMAIL_ALREADY_USED, PASSWORD_IS_REQUIRED, PASSWORD_IS_WRONG } from "../constants/responseErrors";
 
 class UserController {
   static async validateUpdate(user: IUser, updatedUserData: Partial<IUser>) {
@@ -31,6 +31,18 @@ class UserController {
       errors.push(NEW_PASSWORD_IS_REQUIRED);
     } else if (!AuthValidator.checkPasswordStrength(newPassword)) {
       errors.push(NEW_PASSWORD_IS_TOO_WEAK);
+    }
+
+    return { errors };
+  }
+
+  static validateDelete(user: IUser, password?: string) {
+    const errors = [];
+
+    if (!password) {
+      errors.push(PASSWORD_IS_REQUIRED);
+    } else if (!bcrypt.compareSync(password, user.password)) {
+      errors.push(PASSWORD_IS_WRONG);
     }
 
     return { errors };

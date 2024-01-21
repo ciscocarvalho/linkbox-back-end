@@ -30,7 +30,9 @@ meRouter.put("/", async (req, res) => {
 meRouter.delete("/", async (req, res) => {
   try {
     const userId = req.session!.userId!;
-    const user = await UserController.delete(userId);
+    const { password } = req.body;
+    const user = await UserController.delete(userId, password);
+    res.clearCookie("token");
     res.sendData({ user });
   } catch (error: any) {
     res.handleError(error);
