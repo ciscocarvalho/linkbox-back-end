@@ -1,14 +1,14 @@
 export type ResponseErrorBase = {
+  name: string,
   type: string,
   message: string,
-  userMessage: string,
   [k: string]: any,
 };
 
 export class ResponseError extends Error {
   type!: string;
   message!: string;
-  userMessage!: string;
+  userMessage?: string;
 
   constructor(obj: ResponseErrorBase) {
     super();

@@ -2,12 +2,23 @@ import { NextFunction, Request, Response } from "express";
 import { UNKNOWN_ERROR } from "../constants/responseErrors";
 import { ResponseError } from "../utils/ResponseError";
 
+const getUserMessageForError = (req: Request, error: ResponseError) => {
+  const i18nKey = `${error.type}.${error.name}`;
+
+  return req.t([i18nKey, ""] as any) as string;
+};
+
 const responseHelpers = (req: Request, res: Response, next: NextFunction) => {
   res.sendData = (data, statusCode) => {
     res.status(statusCode ?? 200).json({ data });
   }
 
   res.sendErrors = (errors, statusCode) => {
+    errors = errors.map((error) => {
+      error.userMessage = getUserMessageForError(req, error);
+      return error;
+    });
+
     res.status(statusCode ?? 400).json({ errors });
   }
 

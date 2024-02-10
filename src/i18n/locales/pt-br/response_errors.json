@@ -1,0 +1,36 @@
+{
+  "UNKNOWN_ERROR": {
+    "UNKNOWN_ERROR": "Algo deu errado :("
+  },
+  "AUTH_ERROR": {
+    "USER_NOT_AUTHENTICATED": "Usuário não está autenticado.",
+    "USER_NOT_FOUND": "Usuário não foi encontrado.",
+    "EMAIL_IS_REQUIRED": "O email é obrigatório.",
+    "PASSWORD_IS_REQUIRED": "A senha é obrigatória.",
+    "CURRENT_PASSWORD_IS_REQUIRED": "A senha é obrigatória.",
+    "CURRENT_PASSWORD_IS_WRONG": "Senha atual está incorreta.",
+    "NEW_PASSWORD_IS_REQUIRED": "Nova senha é obrigatória.",
+    "NEW_PASSWORD_IS_TOO_WEAK": "Esta senha é fraca demais. Senha deve conter mais de 6 caracteres.",
+    "EMAIL_NOT_FOUND": "Este email não foi encontrado.",
+    "PASSWORD_IS_WRONG": "Esta senha está incorreta.",
+    "USERNAME_IS_REQUIRED": "O nome de usuário é obrigatório.",
+    "EMAIL_IS_NOT_VALID": "Este email é inválido.",
+    "EMAIL_ALREADY_USED": "Este email já está em uso.",
+    "PASSWORD_IS_TOO_WEAK": "Esta senha é fraca demais. Senha deve conter mais de 6 caracteres."
+  },
+  "DASHBOARD_ERROR": {
+    "DASHBOARD_NAME_IS_REQUIRED": "O nome de dashboard é obrigatório.",
+    "DASHBOARD_NAME_IS_ALREADY_USED": "Este nome de dashboard já está em uso.",
+    "DASHBOARD_NOT_FOUND": "Esta dashboard não foi encontrada."
+  },
+  "ITEM_ERROR": {
+    "ITEM_NOT_FOUND": "Este item não foi encontrado.",
+    "FOLDER_NOT_FOUND": "Esta pasta não foi encontrada.",
+    "FOLDER_NAME_IS_REQUIRED": "O nome de pasta é obrigatório.",
+    "FOLDER_NAME_IS_INVALID": "Este nome de pasta é inválido. Nome de pasta não pode conter \"/\".",
+    "FOLDER_NAME_ALREADY_USED": "Este nome de pasta já está em uso.",
+    "ROOT_FOLDER_CANNOT_BE_UPDATED": "Não é possível editar pasta raíz.",
+    "LINK_URL_IS_REQUIRED": "A URL é obrigatória.",
+    "LINK_TITLE_IS_REQUIRED": "O título é obrigatório."
+  }
+}

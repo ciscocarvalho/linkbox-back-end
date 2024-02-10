@@ -1,0 +1,36 @@
+{
+  "UNKNOWN_ERROR": {
+    "UNKNOWN_ERROR": "Something went wrong :("
+  },
+  "AUTH_ERROR": {
+    "USER_NOT_AUTHENTICATED": "User is not authenticated.",
+    "USER_NOT_FOUND": "User was not found.",
+    "EMAIL_IS_REQUIRED": "Email is required.",
+    "PASSWORD_IS_REQUIRED": "Password is required.",
+    "CURRENT_PASSWORD_IS_REQUIRED": "Password is required.",
+    "CURRENT_PASSWORD_IS_WRONG": "Current password is wrong.",
+    "NEW_PASSWORD_IS_REQUIRED": "New password is required.",
+    "NEW_PASSWORD_IS_TOO_WEAK": "This password is too weak. Password must have more than 6 characters.",
+    "EMAIL_NOT_FOUND": "Email not found.",
+    "PASSWORD_IS_WRONG": "Password is wrong.",
+    "USERNAME_IS_REQUIRED": "Username is required.",
+    "EMAIL_IS_NOT_VALID": "This email is invalid.",
+    "EMAIL_ALREADY_USED": "This email is already used.",
+    "PASSWORD_IS_TOO_WEAK": "This password is too weak. Password must have more than 6 characters."
+  },
+  "DASHBOARD_ERROR": {
+    "DASHBOARD_NAME_IS_REQUIRED": "Dashboard name is required.",
+    "DASHBOARD_NAME_IS_ALREADY_USED": "Dashboard name is already used.",
+    "DASHBOARD_NOT_FOUND": "Dashboard not found."
+  },
+  "ITEM_ERROR": {
+    "ITEM_NOT_FOUND": "This item was not found.",
+    "FOLDER_NOT_FOUND": "This folder was not found.",
+    "FOLDER_NAME_IS_REQUIRED": "Folder name is required.",
+    "FOLDER_NAME_IS_INVALID": "This folder name is invalid.",
+    "FOLDER_NAME_ALREADY_USED": "This folder name is already used.",
+    "ROOT_FOLDER_CANNOT_BE_UPDATED": "Cannot update root folder.",
+    "LINK_URL_IS_REQUIRED": "URL is required.",
+    "LINK_TITLE_IS_REQUIRED": "Title is required."
+  }
+}

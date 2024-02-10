@@ -7,27 +7,27 @@ export * from "./authResponseErrors/changePasswordResponseErrors";
 const ERROR_TYPE = "AUTH_ERROR";
 
 export const USER_NOT_AUTHENTICATED = new ResponseError({
+  name: "USER_NOT_AUTHENTICATED",
   type: ERROR_TYPE,
   message: "User is not authenticated.",
-  userMessage: "Usuário não está autenticado.",
 });
 
 export const USER_NOT_FOUND = new ResponseError({
+  name: "USER_NOT_FOUND",
   type: ERROR_TYPE,
   message: "User was not found.",
-  userMessage: "Usuário não foi encontrado.",
 });
 
 export const EMAIL_IS_REQUIRED = new ResponseError({
+  name: "EMAIL_IS_REQUIRED",
   type: ERROR_TYPE,
   field: "email",
   message: "Email is required.",
-  userMessage: "O email é obrigatório.",
 });
 
 export const PASSWORD_IS_REQUIRED = new ResponseError({
+  name: "PASSWORD_IS_REQUIRED",
   type: ERROR_TYPE,
   field: "password",
   message: "Password is required.",
-  userMessage: "A senha é obrigatória.",
 });

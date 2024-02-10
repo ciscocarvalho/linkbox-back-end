@@ -7,12 +7,17 @@ import cors from "cors";
 import session from "./middlewares/session";
 import { FRONTEND_URL } from "./constants";
 import responseHelpers from "./middlewares/responseHelpers";
+import I18n from "./i18n";
+
+I18n.init();
 
 const swaggerDocument = YAML.load("./openapi.yml");
 const app = express();
 
 app.use(express.json());
 app.use(cookieParser());
+app.use(I18n.getMiddleware());
+
 app.use(cors({
   origin: FRONTEND_URL,
   credentials: true,
